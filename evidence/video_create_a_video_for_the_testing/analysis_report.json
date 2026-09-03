@@ -1,0 +1,64 @@
+{
+  "video_file": "create_a_video_for_the_testing.mp4",
+  "video_metadata": {
+    "native_fps": 24.0,
+    "total_frames": 240,
+    "duration_seconds": 10.0,
+    "duration_formatted": "00:00:10.000"
+  },
+  "analysis_settings": {
+    "sample_fps": 1.0,
+    "sampled_frames_processed": 10,
+    "limits_configured": {
+      "PHONE_DETECTED": 5.0,
+      "NO_PERSON_DETECTED": 10.0,
+      "MULTIPLE_PERSONS": 3.0,
+      "UNAUTHORIZED_DEVICE": 5.0
+    }
+  },
+  "overall_status": "FAILED",
+  "overall_limit_exceeded": true,
+  "cumulative_durations": {
+    "PHONE_DETECTED": 4.0,
+    "UNAUTHORIZED_DEVICE": 10.0
+  },
+  "limit_enforcement": {
+    "PHONE_DETECTED": {
+      "cumulative_duration_seconds": 4.0,
+      "limit_threshold_seconds": 5.0,
+      "limit_exceeded": false
+    },
+    "UNAUTHORIZED_DEVICE": {
+      "cumulative_duration_seconds": 10.0,
+      "limit_threshold_seconds": 5.0,
+      "limit_exceeded": true
+    }
+  },
+  "total_violation_intervals_count": 2,
+  "violation_intervals": [
+    {
+      "event_type": "PHONE_DETECTED",
+      "rule_triggered": "IF object IN ['cell phone'] AND confidence >= 0.45",
+      "start_time_sec": 4.0,
+      "end_time_sec": 7.0,
+      "start_timestamp": "00:00:04.000",
+      "end_timestamp": "00:00:07.000",
+      "peak_confidence": 0.58,
+      "evidence_file": "./evidence/video_create_a_video_for_the_testing/extracted_evidence/evidence_phone_detected_4000ms.jpg",
+      "sample_count": 4,
+      "duration_seconds": 4.0
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.70",
+      "start_time_sec": 0.0,
+      "end_time_sec": 9.0,
+      "start_timestamp": "00:00:00.000",
+      "end_timestamp": "00:00:09.000",
+      "peak_confidence": 0.88,
+      "evidence_file": "./evidence/video_create_a_video_for_the_testing/extracted_evidence/evidence_unauthorized_device_0ms.jpg",
+      "sample_count": 10,
+      "duration_seconds": 10.0
+    }
+  ]
+}

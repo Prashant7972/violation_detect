@@ -1,0 +1,46 @@
+{
+  "video_file": "its_good_but_i_want_that_candi.mp4",
+  "video_metadata": {
+    "native_fps": 24.0,
+    "total_frames": 240,
+    "duration_seconds": 10.0,
+    "duration_formatted": "00:00:10.000"
+  },
+  "analysis_settings": {
+    "sample_fps": 2.0,
+    "sampled_frames_processed": 20,
+    "limits_configured": {
+      "PHONE_DETECTED": 5.0,
+      "NO_PERSON_DETECTED": 10.0,
+      "MULTIPLE_PERSONS": 3.0,
+      "UNAUTHORIZED_DEVICE": 5.0
+    }
+  },
+  "overall_status": "PASSED",
+  "overall_limit_exceeded": false,
+  "cumulative_durations": {
+    "PHONE_DETECTED": 2.5
+  },
+  "limit_enforcement": {
+    "PHONE_DETECTED": {
+      "cumulative_duration_seconds": 2.5,
+      "limit_threshold_seconds": 5.0,
+      "limit_exceeded": false
+    }
+  },
+  "total_violation_intervals_count": 1,
+  "violation_intervals": [
+    {
+      "event_type": "PHONE_DETECTED",
+      "rule_triggered": "IF object IN ['cell phone'] AND confidence >= 0.45",
+      "start_time_sec": 5.0,
+      "end_time_sec": 7.0,
+      "start_timestamp": "00:00:05.000",
+      "end_timestamp": "00:00:07.000",
+      "peak_confidence": 0.69,
+      "evidence_file": "./evidence/video_its_good_but_i_want_that_candi/extracted_evidence/evidence_phone_detected_5000ms.jpg",
+      "sample_count": 5,
+      "duration_seconds": 2.5
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video File Analysis & Compliance Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <span class="pulse-icon"></span>
+                <h1>AI Video File Compliance & Duration Analyzer</h1>
+            </div>
+            <div class="system-status" id="systemStatus">
+                <span class="status-badge stopped" id="statusBadge">Ready for Video File</span>
+            </div>
+        </header>
+
+        <!-- Main Content Area: Video File Input & Analysis -->
+        <main class="main-content">
+            <div class="grid-2col">
+                <!-- Left Column: Video File Upload & Parameter Controls -->
+                <section class="card upload-card">
+                    <div class="card-header">
+                        <h2>Input Video Clip</h2>
+                        <span class="badge">MP4, WEBM, AVI, MOV</span>
+                    </div>
+
+                    <!-- Drag and Drop Dropzone -->
+                    <div class="drop-zone" id="dropZone">
+                        <div class="drop-zone-content">
+                            <span class="upload-icon">📁</span>
+                            <p class="drop-text">Drag & Drop your video file here</p>
+                            <span class="or-divider">or</span>
+                            <label for="fileInput" class="btn btn-primary file-select-btn">Choose Video File</label>
+                            <input type="file" id="fileInput" accept="video/mp4,video/webm,video/avi,video/quicktime" hidden>
+                        </div>
+                        <div class="file-info" id="fileInfo" style="display: none;">
+                            <div class="file-details">
+                                <span class="file-name" id="fileNameText">video.mp4</span>
+                                <span class="file-size" id="fileSizeText">12.4 MB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Video Preview Player -->
+                    <div class="video-preview-box" id="videoPreviewBox" style="display: none;">
+                        <video id="videoPreview" controls></video>
+                    </div>
+
+                    <!-- Analysis Parameter Controls & Duration Limits -->
+                    <div class="config-panel">
+                        <h3>Sampling Rate & Duration Limit Settings</h3>
+                        <div class="config-grid">
+                            <div class="input-group">
+                                <label for="sampleFpsSelect">Sampling Frequency:</label>
+                                <select id="sampleFpsSelect">
+                                    <option value="0.5">0.5 FPS (1 frame / 2 sec)</option>
+                                    <option value="1.0" selected>1.0 FPS (1 frame / sec)</option>
+                                    <option value="2.0">2.0 FPS (2 frames / sec)</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="maxPhoneInput">Max Phone Limit (sec):</label>
+                                <input type="number" id="maxPhoneInput" value="5.0" step="0.5" min="0">
+                            </div>
+                            <div class="input-group">
+                                <label for="maxMissingInput">Max Missing Limit (sec):</label>
+                                <input type="number" id="maxMissingInput" value="10.0" step="0.5" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button id="analyzeBtn" class="btn btn-success analyze-btn" disabled>
+                        <span>⚡ Analyze Video File</span>
+                    </button>
+                </section>
+
+                <!-- Right Column: Analysis Results, Duration Timelines & Evidence Gallery -->
+                <section class="card results-card">
+                    <div class="card-header">
+                        <h2>Compliance Analysis Results</h2>
+                        <span class="badge" id="overallResultBadge">Awaiting File</span>
+                    </div>
+
+                    <!-- Loading Spinner Overlay -->
+                    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Processing Video Frames & Calculating Violation Time Durations...</p>
+                    </div>
+
+                    <!-- Results Dashboard Container -->
+                    <div class="results-container" id="resultsContainer">
+                        <div class="empty-state">
+                            <p>Select or drag & drop a video file clip on the left and click <strong>Analyze Video File</strong> to view violation time intervals, cumulative duration limits, and extracted keyframe evidence snapshots.</p>
+                        </div>
+
+                        <!-- Metadata Summary Box -->
+                        <div class="metrics-grid" id="metricsGrid" style="display: none;">
+                            <div class="metric-box">
+                                <span class="m-label">Video Clip Duration</span>
+                                <span class="m-val" id="metaDuration">--</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="m-label">Sampled Frames</span>
+                                <span class="m-val" id="metaSampledFrames">0</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="m-label">Violation Intervals</span>
+                                <span class="m-val alert-text" id="metaIntervalsCount">0</span>
+                            </div>
+                        </div>
+
+                        <!-- Duration Limits Breakdown -->
+                        <div class="limit-section" id="limitSection" style="display: none;">
+                            <h3>Cumulative Violation Durations vs Limits</h3>
+                            <div class="limit-list" id="limitList"></div>
+                        </div>
+
+                        <!-- Violation Intervals Timeline -->
+                        <div class="intervals-section" id="intervalsSection" style="display: none;">
+                            <h3>Violation Time Intervals & Evidence Keyframes</h3>
+                            <div class="intervals-list" id="intervalsList"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

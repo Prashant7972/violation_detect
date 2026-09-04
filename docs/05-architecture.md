@@ -4,8 +4,8 @@
                                │           Video File Processor           │
                                │                                          │
  ┌────────────────┐            │  ┌────────────┐      ┌────────────────┐  │
- │ CLI Script /   │  HTTP / CLI│  │ cv2.Video  │─────►│ Frame Sampler  │  │
- │ REST API Input │───────────┼─►│ Capture    │      │ (1 FPS)        │  │
+ │ CLI Script /   │  HTTP / CLI│  │ Serial ID  │─────►│ Frame Sampler  │  │
+ │ REST API Input │───────────┼─►│ Generator  │      │ (1 FPS)        │  │
  └────────────────┘            │  └────────────┘      └───────┬────────┘  │
                                │                              │           │
                                │                              ▼           │
@@ -29,8 +29,8 @@
                                       ┌───────────────────────┴───────────────────────┐
                                       ▼                                               ▼
                          ┌─────────────────────────┐                     ┌─────────────────────────┐
-                         │ Extracted Keyframe      │                     │ Analysis Report         │
-                         │ Evidence (/evidence/*)  │                     │ (analysis_report.json)  │
+                         │ Candidate Isolated      │                     │ Relational DB Record    │
+                         │ Storage (/evidence/*)   │                     │ (CandidateSubmissions)  │
                          └─────────────────────────┘                     └─────────────────────────┘
 ```
 
@@ -39,11 +39,11 @@
 ---
 
 ## 9. Component Responsibilities
-- **Video Sampler (`cv2.VideoCapture`)**: Reads video file metadata, steps through video frames at configured sample rates, and handles timestamp conversions (`HH:MM:SS.mmm`).
-- **AI Detection Engine (`AIDetector`)**: Runs object predictions on sampled frames, applies YOLOv8 or OpenCV cascades, and deduplicates person bounding boxes via IoU NMS.
-- **Rule Engine (`RuleEngine`)**: Matches observations against compliance rules (`PHONE_DETECTED`, `MULTIPLE_PERSONS`, `NO_PERSON_DETECTED`, `UNAUTHORIZED_DEVICE`).
-- **Time Interval Tracker**: Aggregates consecutive violation frames into distinct intervals (`start_timestamp`, `end_timestamp`, `duration_seconds`) and computes cumulative durations.
-- **Limit Enforcer**: Compares cumulative violation durations against configured thresholds and flags `PASSED` / `FAILED` overall status.
-- **Evidence Snapshotter**: Annotates violation frames with red bounding boxes and writes keyframe JPEG files to disk.
+- **Serial Student ID Generator**: Scans existing submissions and assigns next sequential zero-padded ID (`STU-001`, `STU-002`, ...).
+- **System Reset Service**: Handles `POST /api/v1/system/reset`, truncating all DB tables and removing file artifacts from disk.
+- **Video Sampler**: Steps through video frames at configured sample rates (`1.0 FPS`).
+- **AI Detection Engine (`AIDetector`)**: Predicts objects and deduplicates person bounding boxes.
+- **Rule Engine (`RuleEngine`)**: Matches observations against compliance rules.
+- **Limit Enforcer**: Compares cumulative violation durations against thresholds (`PASSED` / `FAILED`).
 
 ---

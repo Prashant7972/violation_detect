@@ -1,0 +1,483 @@
+{
+  "candidate_info": {
+    "student_id": "STU-002",
+    "student_name": "STU-002",
+    "exam_id": "MIDTERM-2026"
+  },
+  "video_file": "Recording from 2026-09-03 14-25-54.546874.mp4",
+  "video_metadata": {
+    "native_fps": 26.52,
+    "total_frames": 8055,
+    "duration_seconds": 303.74,
+    "duration_formatted": "00:05:03.744"
+  },
+  "analysis_settings": {
+    "sample_fps": 1.0,
+    "sampled_frames_processed": 310,
+    "limits_configured": {
+      "PHONE_DETECTED": 0.0,
+      "MULTIPLE_PERSONS": 0.0,
+      "UNAUTHORIZED_DEVICE": 0.0,
+      "NO_PERSON_DETECTED": 5.0
+    }
+  },
+  "overall_status": "FAILED",
+  "overall_limit_exceeded": true,
+  "cumulative_durations": {
+    "NO_PERSON_DETECTED": 177.85,
+    "UNAUTHORIZED_DEVICE": 20.86,
+    "MULTIPLE_PERSONS": 5.92
+  },
+  "limit_enforcement": {
+    "NO_PERSON_DETECTED": {
+      "cumulative_duration_seconds": 177.85,
+      "limit_threshold_seconds": 5.0,
+      "limit_exceeded": true
+    },
+    "UNAUTHORIZED_DEVICE": {
+      "cumulative_duration_seconds": 20.86,
+      "limit_threshold_seconds": 0.0,
+      "limit_exceeded": true
+    },
+    "MULTIPLE_PERSONS": {
+      "cumulative_duration_seconds": 5.92,
+      "limit_threshold_seconds": 0.0,
+      "limit_exceeded": true
+    }
+  },
+  "total_violation_intervals_count": 36,
+  "violation_intervals": [
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 19.608572729153735,
+      "end_time_sec": 21.569430002069108,
+      "start_timestamp": "00:00:19.609",
+      "end_timestamp": "00:00:21.569",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_19608ms.jpg",
+      "sample_count": 3,
+      "duration_seconds": 2.96
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 24.51071591144217,
+      "end_time_sec": 24.51071591144217,
+      "start_timestamp": "00:00:24.511",
+      "end_timestamp": "00:00:24.511",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_24510ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 31.373716366645976,
+      "end_time_sec": 31.373716366645976,
+      "start_timestamp": "00:00:31.374",
+      "end_timestamp": "00:00:31.374",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_31373ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 37.256288185392094,
+      "end_time_sec": 37.256288185392094,
+      "start_timestamp": "00:00:37.256",
+      "end_timestamp": "00:00:37.256",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_37256ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 48.04100318642665,
+      "end_time_sec": 48.04100318642665,
+      "start_timestamp": "00:00:48.041",
+      "end_timestamp": "00:00:48.041",
+      "peak_confidence": 0.71,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_unauthorized_device_48041ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 54.90400364163045,
+      "end_time_sec": 55.88443227808814,
+      "start_timestamp": "00:00:54.904",
+      "end_timestamp": "00:00:55.884",
+      "peak_confidence": 0.66,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_unauthorized_device_54904ms.jpg",
+      "sample_count": 2,
+      "duration_seconds": 1.98
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 64.70829000620732,
+      "end_time_sec": 66.6691472791227,
+      "start_timestamp": "00:01:04.708",
+      "end_timestamp": "00:01:06.669",
+      "peak_confidence": 0.71,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_unauthorized_device_64708ms.jpg",
+      "sample_count": 3,
+      "duration_seconds": 2.96
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 75.49300500724188,
+      "end_time_sec": 76.47343364369956,
+      "start_timestamp": "00:01:15.493",
+      "end_timestamp": "00:01:16.473",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_75493ms.jpg",
+      "sample_count": 2,
+      "duration_seconds": 1.98
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 78.43429091661494,
+      "end_time_sec": 79.41471955307263,
+      "start_timestamp": "00:01:18.434",
+      "end_timestamp": "00:01:19.415",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_78434ms.jpg",
+      "sample_count": 2,
+      "duration_seconds": 1.98
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 79.41471955307263,
+      "end_time_sec": 81.37557682598799,
+      "start_timestamp": "00:01:19.415",
+      "end_timestamp": "00:01:21.376",
+      "peak_confidence": 0.8,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_unauthorized_device_79414ms.jpg",
+      "sample_count": 3,
+      "duration_seconds": 2.96
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 83.33643409890337,
+      "end_time_sec": 84.31686273536106,
+      "start_timestamp": "00:01:23.336",
+      "end_timestamp": "00:01:24.317",
+      "peak_confidence": 0.77,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_unauthorized_device_83336ms.jpg",
+      "sample_count": 2,
+      "duration_seconds": 1.98
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 85.29729137181874,
+      "end_time_sec": 143.14258092282225,
+      "start_timestamp": "00:01:25.297",
+      "end_timestamp": "00:02:23.143",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_85297ms.jpg",
+      "sample_count": 60,
+      "duration_seconds": 58.85
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 146.08386683219533,
+      "end_time_sec": 146.08386683219533,
+      "start_timestamp": "00:02:26.084",
+      "end_timestamp": "00:02:26.084",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_146083ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 149.02515274156838,
+      "end_time_sec": 149.02515274156838,
+      "start_timestamp": "00:02:29.025",
+      "end_timestamp": "00:02:29.025",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_149025ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 150.98601001448375,
+      "end_time_sec": 150.98601001448375,
+      "start_timestamp": "00:02:30.986",
+      "end_timestamp": "00:02:30.986",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_150986ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 168.6337254707221,
+      "end_time_sec": 168.6337254707221,
+      "start_timestamp": "00:02:48.634",
+      "end_timestamp": "00:02:48.634",
+      "peak_confidence": 0.69,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_unauthorized_device_168633ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 178.438011835299,
+      "end_time_sec": 179.41844047175667,
+      "start_timestamp": "00:02:58.438",
+      "end_timestamp": "00:02:59.418",
+      "peak_confidence": 0.74,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_unauthorized_device_178438ms.jpg",
+      "sample_count": 2,
+      "duration_seconds": 1.98
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 193.14444138216427,
+      "end_time_sec": 193.14444138216427,
+      "start_timestamp": "00:03:13.144",
+      "end_timestamp": "00:03:13.144",
+      "peak_confidence": 0.66,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_unauthorized_device_193144ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 199.0270132009104,
+      "end_time_sec": 199.0270132009104,
+      "start_timestamp": "00:03:19.027",
+      "end_timestamp": "00:03:19.027",
+      "peak_confidence": 0.72,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_unauthorized_device_199027ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 202.94872774674116,
+      "end_time_sec": 202.94872774674116,
+      "start_timestamp": "00:03:22.949",
+      "end_timestamp": "00:03:22.949",
+      "peak_confidence": 0.73,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_unauthorized_device_202948ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 152.94686728739913,
+      "end_time_sec": 204.90958501965653,
+      "start_timestamp": "00:02:32.947",
+      "end_timestamp": "00:03:24.910",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_152946ms.jpg",
+      "sample_count": 54,
+      "duration_seconds": 52.96
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 215.6943000206911,
+      "end_time_sec": 215.6943000206911,
+      "start_timestamp": "00:03:35.694",
+      "end_timestamp": "00:03:35.694",
+      "peak_confidence": 0.72,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_unauthorized_device_215694ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 219.6160145665218,
+      "end_time_sec": 219.6160145665218,
+      "start_timestamp": "00:03:39.616",
+      "end_timestamp": "00:03:39.616",
+      "peak_confidence": 0.72,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_unauthorized_device_219616ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 206.8704422925719,
+      "end_time_sec": 225.49858638526794,
+      "start_timestamp": "00:03:26.870",
+      "end_timestamp": "00:03:45.499",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_206870ms.jpg",
+      "sample_count": 20,
+      "duration_seconds": 19.63
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 232.36158684047174,
+      "end_time_sec": 232.36158684047174,
+      "start_timestamp": "00:03:52.362",
+      "end_timestamp": "00:03:52.362",
+      "peak_confidence": 0.68,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_unauthorized_device_232361ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 228.439872294641,
+      "end_time_sec": 241.18544456859092,
+      "start_timestamp": "00:03:48.440",
+      "end_timestamp": "00:04:01.185",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_228439ms.jpg",
+      "sample_count": 14,
+      "duration_seconds": 13.75
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 243.1463018415063,
+      "end_time_sec": 244.126730477964,
+      "start_timestamp": "00:04:03.146",
+      "end_timestamp": "00:04:04.127",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_243146ms.jpg",
+      "sample_count": 2,
+      "duration_seconds": 1.98
+    },
+    {
+      "event_type": "MULTIPLE_PERSONS",
+      "rule_triggered": "IF count(person) > 1 AND confidence >= 0.55",
+      "start_time_sec": 250.0093022967101,
+      "end_time_sec": 250.9897309331678,
+      "start_timestamp": "00:04:10.009",
+      "end_timestamp": "00:04:10.990",
+      "peak_confidence": 0.94,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_multiple_persons_250009ms.jpg",
+      "sample_count": 2,
+      "duration_seconds": 1.98
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 252.95058820608318,
+      "end_time_sec": 252.95058820608318,
+      "start_timestamp": "00:04:12.951",
+      "end_timestamp": "00:04:12.951",
+      "peak_confidence": 0.73,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_unauthorized_device_252950ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 262.75487457066004,
+      "end_time_sec": 263.73530320711774,
+      "start_timestamp": "00:04:22.755",
+      "end_timestamp": "00:04:23.735",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_262754ms.jpg",
+      "sample_count": 2,
+      "duration_seconds": 1.98
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 267.6570177529485,
+      "end_time_sec": 267.6570177529485,
+      "start_timestamp": "00:04:27.657",
+      "end_timestamp": "00:04:27.657",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_267657ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 269.61787502586384,
+      "end_time_sec": 269.61787502586384,
+      "start_timestamp": "00:04:29.618",
+      "end_timestamp": "00:04:29.618",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_269617ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 271.57873229877924,
+      "end_time_sec": 272.5591609352369,
+      "start_timestamp": "00:04:31.579",
+      "end_timestamp": "00:04:32.559",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_271578ms.jpg",
+      "sample_count": 2,
+      "duration_seconds": 1.98
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 279.4221613904407,
+      "end_time_sec": 280.4025900268984,
+      "start_timestamp": "00:04:39.422",
+      "end_timestamp": "00:04:40.403",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_279422ms.jpg",
+      "sample_count": 2,
+      "duration_seconds": 1.98
+    },
+    {
+      "event_type": "NO_PERSON_DETECTED",
+      "rule_triggered": "IF count(person) == 0 AND confidence >= 0.55",
+      "start_time_sec": 286.2851618456445,
+      "end_time_sec": 295.1090195737637,
+      "start_timestamp": "00:04:46.285",
+      "end_timestamp": "00:04:55.109",
+      "peak_confidence": 1.0,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_no_person_detected_286285ms.jpg",
+      "sample_count": 10,
+      "duration_seconds": 9.82
+    },
+    {
+      "event_type": "MULTIPLE_PERSONS",
+      "rule_triggered": "IF count(person) > 1 AND confidence >= 0.55",
+      "start_time_sec": 300.01116275605216,
+      "end_time_sec": 302.9524486654252,
+      "start_timestamp": "00:05:00.011",
+      "end_timestamp": "00:05:02.952",
+      "peak_confidence": 0.94,
+      "evidence_file": "./evidence/candidates/STU-002/Recording from 2026-09-03 14-25-54.546874_1788498187388/extracted_evidence/evidence_multiple_persons_300011ms.jpg",
+      "sample_count": 4,
+      "duration_seconds": 3.94
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "candidate_info": {
+    "student_id": "STU-001",
+    "student_name": "STU-001",
+    "exam_id": "MIDTERM-2026"
+  },
+  "video_file": "Recording from 2026-09-03 14-24-21.948793.mp4",
+  "video_metadata": {
+    "native_fps": 27.46,
+    "total_frames": 494,
+    "duration_seconds": 17.99,
+    "duration_formatted": "00:00:17.992"
+  },
+  "analysis_settings": {
+    "sample_fps": 1.0,
+    "sampled_frames_processed": 19,
+    "limits_configured": {
+      "PHONE_DETECTED": 0.0,
+      "MULTIPLE_PERSONS": 0.0,
+      "UNAUTHORIZED_DEVICE": 0.0,
+      "NO_PERSON_DETECTED": 5.0
+    }
+  },
+  "overall_status": "FAILED",
+  "overall_limit_exceeded": true,
+  "cumulative_durations": {
+    "PHONE_DETECTED": 2.0,
+    "UNAUTHORIZED_DEVICE": 9.88
+  },
+  "limit_enforcement": {
+    "PHONE_DETECTED": {
+      "cumulative_duration_seconds": 2.0,
+      "limit_threshold_seconds": 0.0,
+      "limit_exceeded": true
+    },
+    "UNAUTHORIZED_DEVICE": {
+      "cumulative_duration_seconds": 9.88,
+      "limit_threshold_seconds": 0.0,
+      "limit_exceeded": true
+    }
+  },
+  "total_violation_intervals_count": 5,
+  "violation_intervals": [
+    {
+      "event_type": "PHONE_DETECTED",
+      "rule_triggered": "IF object IN ['cell phone'] AND confidence >= 0.3",
+      "start_time_sec": 3.9334736842105262,
+      "end_time_sec": 3.9334736842105262,
+      "start_timestamp": "00:00:03.933",
+      "end_timestamp": "00:00:03.933",
+      "peak_confidence": 0.62,
+      "evidence_file": "./evidence/candidates/STU-001/Recording from 2026-09-03 14-24-21.948793_1788498181886/extracted_evidence/evidence_phone_detected_3933ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 0.0,
+      "end_time_sec": 5.90021052631579,
+      "start_timestamp": "00:00:00.000",
+      "end_timestamp": "00:00:05.900",
+      "peak_confidence": 0.86,
+      "evidence_file": "./evidence/candidates/STU-001/Recording from 2026-09-03 14-24-21.948793_1788498181886/extracted_evidence/evidence_unauthorized_device_0ms.jpg",
+      "sample_count": 7,
+      "duration_seconds": 6.9
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 7.8669473684210525,
+      "end_time_sec": 8.850315789473685,
+      "start_timestamp": "00:00:07.867",
+      "end_timestamp": "00:00:08.850",
+      "peak_confidence": 0.82,
+      "evidence_file": "./evidence/candidates/STU-001/Recording from 2026-09-03 14-24-21.948793_1788498181886/extracted_evidence/evidence_unauthorized_device_7866ms.jpg",
+      "sample_count": 2,
+      "duration_seconds": 1.98
+    },
+    {
+      "event_type": "PHONE_DETECTED",
+      "rule_triggered": "IF object IN ['cell phone'] AND confidence >= 0.3",
+      "start_time_sec": 10.817052631578948,
+      "end_time_sec": 10.817052631578948,
+      "start_timestamp": "00:00:10.817",
+      "end_timestamp": "00:00:10.817",
+      "peak_confidence": 0.56,
+      "evidence_file": "./evidence/candidates/STU-001/Recording from 2026-09-03 14-24-21.948793_1788498181886/extracted_evidence/evidence_phone_detected_10817ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    },
+    {
+      "event_type": "UNAUTHORIZED_DEVICE",
+      "rule_triggered": "IF object IN ['laptop', 'tv'] AND confidence >= 0.65",
+      "start_time_sec": 10.817052631578948,
+      "end_time_sec": 10.817052631578948,
+      "start_timestamp": "00:00:10.817",
+      "end_timestamp": "00:00:10.817",
+      "peak_confidence": 0.74,
+      "evidence_file": "./evidence/candidates/STU-001/Recording from 2026-09-03 14-24-21.948793_1788498181886/extracted_evidence/evidence_unauthorized_device_10817ms.jpg",
+      "sample_count": 1,
+      "duration_seconds": 1.0
+    }
+  ]
+}

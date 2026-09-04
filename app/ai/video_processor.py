@@ -2,26 +2,30 @@ import os
 import cv2
 import json
 import logging
+import time
+import re
 import numpy as np
 from typing import Dict, Any, List, Optional
+from datetime import datetime, timezone
 
 from app.config import settings
 from app.ai.detector import detector, AIDetector
 from app.ai.rule_engine import RuleEngine
+from app.db.models import CandidateSubmissionModel
 
 logger = logging.getLogger("app.ai.video_processor")
 
 class VideoProcessor:
     """
     Processes video files, samples frames, runs AI detection & compliance rules,
-    tracks simultaneous violation intervals, checks duration limits, and extracts
-    multi-object color-coded evidence keyframes.
+    tracks simultaneous violation intervals, checks duration limits, extracts
+    multi-object evidence keyframes, and persists Candidate/Student submission records.
     """
     DEFAULT_LIMITS = {
-        "PHONE_DETECTED": 5.0,           # Max 5.0 seconds allowed
-        "NO_PERSON_DETECTED": 10.0,       # Max 10.0 seconds missing allowed
-        "MULTIPLE_PERSONS": 3.0,          # Max 3.0 seconds multiple persons allowed
-        "UNAUTHORIZED_DEVICE": 5.0        # Max 5.0 seconds unauthorized device allowed
+        "PHONE_DETECTED": 0.0,           # Zero tolerance (any phone usage causes FAILED)
+        "MULTIPLE_PERSONS": 0.0,         # Zero tolerance (any second person causes FAILED)
+        "UNAUTHORIZED_DEVICE": 0.0,      # Zero tolerance (any laptop/TV causes FAILED)
+        "NO_PERSON_DETECTED": 5.0        # Max 5.0 seconds missing allowed
     }
 
     @staticmethod
@@ -37,22 +41,64 @@ class VideoProcessor:
         return f"{hrs:02d}:{mins:02d}:{secs:02d}.{millis:03d}"
 
     @classmethod
+    def get_next_serial_student_id(cls, db_session: Optional[Any] = None) -> str:
+        """
+        Generates the next sequential, zero-padded Student ID (STU-001, STU-002, STU-003, ...).
+        """
+        if db_session is None:
+            return "STU-001"
+
+        try:
+            submissions = db_session.query(CandidateSubmissionModel.student_id).filter(
+                CandidateSubmissionModel.student_id.like("STU-%")
+            ).all()
+
+            numbers = []
+            for (s_id,) in submissions:
+                match = re.search(r"STU-(\d+)", s_id, re.IGNORECASE)
+                if match:
+                    numbers.append(int(match.group(1)))
+
+            next_num = max(numbers) + 1 if numbers else 1
+            return f"STU-{next_num:03d}"
+        except Exception as e:
+            logger.error(f"Error calculating next serial student ID: {e}")
+            return "STU-001"
+
+    @classmethod
     def process_video_file(
         cls,
         video_path: str,
-        output_dir: str,
+        output_dir: Optional[str] = None,
         sample_fps: float = 1.0,
-        custom_limits: Optional[Dict[str, float]] = None
+        custom_limits: Optional[Dict[str, float]] = None,
+        student_id: Optional[str] = None,
+        student_name: Optional[str] = None,
+        exam_id: Optional[str] = None,
+        db_session: Optional[Any] = None
     ) -> Dict[str, Any]:
         """
-        Main video analysis entrypoint.
+        Main video analysis entrypoint for Candidate/Student submissions.
         """
         if not os.path.exists(video_path):
             raise FileNotFoundError(f"Video file not found at path: {video_path}")
 
+        # Generate serial Student ID if student_id is empty, generic, or omitted
+        if not student_id or student_id.strip() in ["", "STU-UNKNOWN", "STU-101"]:
+            student_id = cls.get_next_serial_student_id(db_session)
+        else:
+            student_id = student_id.strip()
+
         limits = cls.DEFAULT_LIMITS.copy()
         if custom_limits:
             limits.update(custom_limits)
+
+        # Candidate-isolated storage path
+        clean_file_stem = os.path.splitext(os.path.basename(video_path))[0]
+        timestamp_slug = int(time.time() * 1000)
+        
+        if not output_dir:
+            output_dir = os.path.join(settings.EVIDENCE_DIR, "candidates", student_id, f"{clean_file_stem}_{timestamp_slug}")
 
         os.makedirs(output_dir, exist_ok=True)
         evidence_dir = os.path.join(output_dir, "extracted_evidence")
@@ -97,9 +143,7 @@ class VideoProcessor:
                     event_type = rule["event_type"]
                     rule_types_present.add(event_type)
 
-                    # Update or start active interval for this event type
                     if event_type not in active_intervals:
-                        # Annotate frame with ALL detected violation objects (phones, persons, devices)
                         annotated = AIDetector.annotate_frame(frame, detections)
                         
                         kf_name = f"evidence_{event_type.lower()}_{int(current_time_sec*1000)}ms.jpg"
@@ -118,7 +162,6 @@ class VideoProcessor:
                             "sample_count": 1
                         }
                     else:
-                        # Extend existing active interval
                         interval = active_intervals[event_type]
                         interval["end_time_sec"] = current_time_sec
                         interval["end_timestamp"] = formatted_time
@@ -126,7 +169,6 @@ class VideoProcessor:
                         if rule["confidence"] > interval["peak_confidence"]:
                             interval["peak_confidence"] = rule["confidence"]
 
-                # Close intervals for event types no longer present
                 ended_keys = [k for k in active_intervals if k not in rule_types_present]
                 for k in ended_keys:
                     interval = active_intervals.pop(k)
@@ -146,13 +188,12 @@ class VideoProcessor:
 
         cap.release()
 
-        # Close any remaining active intervals at end of video
         for k, interval in active_intervals.items():
             interval_duration = (interval["end_time_sec"] - interval["start_time_sec"]) + (1.0 / sample_fps)
             interval["duration_seconds"] = round(interval_duration, 2)
             completed_intervals.append(interval)
 
-        # Calculate cumulative durations per event type
+        # Calculate cumulative durations
         cumulative_durations: Dict[str, float] = {}
         for interval in completed_intervals:
             ev_type = interval["event_type"]
@@ -160,13 +201,12 @@ class VideoProcessor:
                 cumulative_durations.get(ev_type, 0.0) + interval["duration_seconds"], 2
             )
 
-        # Check limit thresholds
         limit_checks = {}
         overall_limit_exceeded = False
 
         for ev_type, duration in cumulative_durations.items():
-            threshold = limits.get(ev_type, 10.0)
-            exceeded = duration > threshold
+            threshold = limits.get(ev_type, 0.0)
+            exceeded = (duration > threshold) if threshold > 0 else (duration > 0)
             if exceeded:
                 overall_limit_exceeded = True
             
@@ -176,8 +216,15 @@ class VideoProcessor:
                 "limit_exceeded": exceeded
             }
 
-        # Build final analysis report
+        overall_status = "FAILED" if overall_limit_exceeded else "PASSED"
+
+        # Build report structure
         report = {
+            "candidate_info": {
+                "student_id": student_id,
+                "student_name": student_name or student_id,
+                "exam_id": exam_id or "GENERAL"
+            },
             "video_file": os.path.basename(video_path),
             "video_metadata": {
                 "native_fps": round(native_fps, 2),
@@ -190,7 +237,7 @@ class VideoProcessor:
                 "sampled_frames_processed": len(raw_frame_results),
                 "limits_configured": limits
             },
-            "overall_status": "FAILED" if overall_limit_exceeded else "PASSED",
+            "overall_status": overall_status,
             "overall_limit_exceeded": overall_limit_exceeded,
             "cumulative_durations": cumulative_durations,
             "limit_enforcement": limit_checks,
@@ -198,10 +245,32 @@ class VideoProcessor:
             "violation_intervals": completed_intervals
         }
 
-        # Save report JSON file
         report_json_path = os.path.join(output_dir, "analysis_report.json")
         with open(report_json_path, "w") as f:
             json.dump(report, f, indent=2)
 
         report["report_file_path"] = report_json_path
+
+        # Persist DB record if db_session is provided
+        if db_session is not None:
+            submission_obj = CandidateSubmissionModel(
+                student_id=student_id,
+                student_name=student_name,
+                exam_id=exam_id,
+                video_filename=os.path.basename(video_path),
+                video_duration_seconds=round(video_duration_sec, 2),
+                overall_status=overall_status,
+                limit_exceeded=1 if overall_limit_exceeded else 0,
+                phone_duration_seconds=cumulative_durations.get("PHONE_DETECTED", 0.0),
+                missing_duration_seconds=cumulative_durations.get("NO_PERSON_DETECTED", 0.0),
+                multiple_persons_duration_seconds=cumulative_durations.get("MULTIPLE_PERSONS", 0.0),
+                report_json_path=report_json_path,
+                evidence_dir_path=output_dir
+            )
+            db_session.add(submission_obj)
+            db_session.commit()
+            db_session.refresh(submission_obj)
+            report["submission_id"] = submission_obj.submission_id
+            report["db_id"] = submission_obj.id
+
         return report

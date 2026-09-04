@@ -1,6 +1,5 @@
 ## 25. Testing Strategy
-- Unit tests for `VideoProcessor` time interval calculations.
-- CLI execution tests on synthetic test video files.
-- FastAPI integration tests for `/api/v1/videos/process`.
+- Unit tests for serial Student ID generation (`STU-001`, `STU-002`).
+- Integration tests for System Reset API (`POST /api/v1/system/reset`).
 
 ---

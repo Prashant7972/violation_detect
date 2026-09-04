@@ -10,14 +10,14 @@ pip install -r requirements.txt
 ---
 
 ## 29. Running the Application
-### 1. Run CLI Video Processor Script
-```bash
-python process_video.py --input sample_video.mp4 --sample-fps 1.0 --max-phone 5.0
-```
-
-### 2. Run API Server
+### 1. Launch Web Application
 ```bash
 python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+### 2. Reset All Data via API
+```bash
+curl -X POST http://localhost:8000/api/v1/system/reset
 ```
 
 ---
@@ -25,14 +25,14 @@ python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ---
 
 ## 34. Monitoring
-Prometheus metrics tracking video processing duration and limit violations.
+Prometheus metrics tracking processing times and reset events.
 
 ---
 
 ---
 
 ## 35. Maintenance
-Retention policies for processed video outputs and evidence snapshots.
+Automated disk purging and log rotation.
 
 ---
 
@@ -40,27 +40,20 @@ Retention policies for processed video outputs and evidence snapshots.
 
 ## 36. Final End-to-End Workflow
 ```
-[USER / CLIENT]
-  │  Provides video clip: video.mp4
+[ADMIN / USER]
+  │  Leaves Student ID blank or provides custom ID
   ▼
-[CLI / REST API]
-  │  python process_video.py --input video.mp4  OR  POST /api/v1/videos/process
+[SERIAL ID GENERATOR]
+  │  Assigns next serial ID: STU-001  ──►  STU-002  ──►  STU-003
   ▼
-[VIDEO SAMPLER]
-  │  cv2.VideoCapture  ──►  Sample frames at 1 FPS  ──►  Compute Timestamps
+[VIDEO SAMPLER & AI DETECTOR]
+  │  Sample frames at 1 FPS  ──►  YOLOv8 Inference  ──►  Rule Evaluation
   ▼
-[AI DETECTOR & RULE ENGINE]
-  │  YOLOv8 Inference  ──►  Evaluate Detections against Rules
+[TIME TRACKER & LIMIT ENGINE]
+  │  Calculate violation durations  ──►  Flag PASSED or FAILED
   ▼
-[TIME INTERVAL & LIMIT ENGINE]
-  │  Group frames into intervals (start_time, end_time, duration_seconds)
-  │  Sum cumulative durations & check limit thresholds (PHONE_DETECTED > 5.0s?)
+[EXAMINER DIRECTORY & SYSTEM RESET]
+  │  View candidate reports or click "Reset All Data" to clear storage
   ▼
-[EVIDENCE EXTRACTOR]
-  │  Annotate frames with bounding boxes  ──►  Save evidence JPEGs to disk
-  ▼
-[OUTPUT REPORT]
-  │  Generates JSON Report & displays summary with PASSED / FAILED status
-  ▼
-[AUDITOR / USER]
+[CLEAN STATE]
 ```

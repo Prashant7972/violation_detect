@@ -1,4 +1,4 @@
 ## 30. Future Redis Architecture
-Redis Streams for background video file processing queues.
+Redis Streams queue for high-volume video processing.
 
 ---

@@ -1,21 +1,18 @@
 ## 6. User Workflow
 ```
-USER
+USER / ADMIN
   │
-  ├─► Provides Video Clip Input (e.g. video.mp4)
+  ├─► Provides Video Clip Input (e.g. candidate_video.mp4)
   │
-  ├─► Configures Sampling FPS (e.g. 1 FPS) & Duration Limits
+  ├─► Leaves Student ID blank or provides custom Student ID (e.g. STU-001)
   │
-  ├─► Executes CLI script `python process_video.py --input video.mp4`
-  │   OR uploads file via API `POST /api/v1/videos/process`
+  ├─► Submits video file via CLI `python process_video.py` or Web UI Dashboard
   │
-  ├─► System processes video clip frame-by-frame
+  ├─► System processes video clip & calculates violation time intervals
   │
-  ├─► System calculates violation time intervals & cumulative durations
+  ├─► System stores evidence in candidate-isolated directory `/evidence/candidates/STU-001/`
   │
-  ├─► System extracts annotated evidence keyframe images
-  │
-  └─► Receives structured JSON Analysis Report & Evidence directory
+  └─► Admin can view Candidate Directory or click "Reset All Data" to start clean
 ```
 
 ---

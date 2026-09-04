@@ -43,3 +43,25 @@ class EvidenceModel(Base):
     created_at = Column(DateTime, default=utc_now)
 
     event = relationship("EventModel", back_populates="evidence")
+
+
+class CandidateSubmissionModel(Base):
+    __tablename__ = "candidate_submissions"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    submission_id = Column(String(64), unique=True, index=True, default=lambda: f"sub-{uuid.uuid4().hex[:12]}")
+    student_id = Column(String(64), nullable=False, index=True)
+    student_name = Column(String(128), nullable=True)
+    exam_id = Column(String(64), nullable=True, index=True)
+    video_filename = Column(String(256), nullable=False)
+    video_duration_seconds = Column(Float, nullable=False)
+    overall_status = Column(String(32), nullable=False, default="PASSED")
+    limit_exceeded = Column(Integer, nullable=False, default=0) # 0 = False, 1 = True
+    
+    phone_duration_seconds = Column(Float, nullable=False, default=0.0)
+    missing_duration_seconds = Column(Float, nullable=False, default=0.0)
+    multiple_persons_duration_seconds = Column(Float, nullable=False, default=0.0)
+    
+    report_json_path = Column(String(512), nullable=False)
+    evidence_dir_path = Column(String(512), nullable=False)
+    created_at = Column(DateTime, default=utc_now)

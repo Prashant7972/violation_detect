@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field, ConfigDict
 
 class CreateSessionRequest(BaseModel):
@@ -38,3 +38,30 @@ class SessionEventsResponse(BaseModel):
     session_id: str
     total_events: int
     events: List[EventResponse]
+
+class CandidateSubmissionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    submission_id: str
+    student_id: str
+    student_name: Optional[str] = None
+    exam_id: Optional[str] = None
+    video_filename: str
+    video_duration_seconds: float
+    overall_status: str
+    limit_exceeded: int
+    phone_duration_seconds: float
+    missing_duration_seconds: float
+    multiple_persons_duration_seconds: float
+    report_json_path: str
+    evidence_dir_path: str
+    created_at: datetime.datetime
+
+class CandidateListResponse(BaseModel):
+    total_submissions: int
+    submissions: List[CandidateSubmissionResponse]
+
+class BatchProcessResponse(BaseModel):
+    total_files_processed: int
+    submissions: List[Dict[str, Any]]

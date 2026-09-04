@@ -1,7 +1,7 @@
 ## 15. Backend Workflow
-1. API router accepts `UploadFile`.
-2. Saves file to temporary path.
-3. Calls `VideoProcessor`.
-4. Returns report JSON and serves evidence keyframes under `/evidence/` endpoint.
+1. Client calls `POST /api/v1/videos/process`.
+2. Serial generator resolves `student_id`.
+3. `VideoProcessor` executes frame sampling & rule evaluations.
+4. Saves DB record and outputs JSON report.
 
 ---

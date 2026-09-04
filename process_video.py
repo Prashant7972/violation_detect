@@ -1,27 +1,64 @@
 #!/usr/bin/env python3
 """
-CLI Utility to process an input video clip, analyze frames for rule violations,
-calculate violation time intervals, check limits, and extract evidence snapshots.
+CLI Utility to process individual or batch candidate video clips, analyze frames for rule violations,
+calculate violation time intervals, check limits, and organize extracted evidence by Serial Student ID.
 """
 
+import os
 import sys
 import argparse
-import json
+import glob
+from app.db.session import SessionLocal, engine, Base
 from app.ai.video_processor import VideoProcessor
+
+# Ensure database tables exist
+Base.metadata.create_all(bind=engine)
+
+def process_single_video(input_path, student_id, student_name, exam_id, sample_fps, limits, output_dir=None):
+    db_session = SessionLocal()
+    try:
+        report = VideoProcessor.process_video_file(
+            video_path=input_path,
+            output_dir=output_dir,
+            sample_fps=sample_fps,
+            custom_limits=limits,
+            student_id=student_id,
+            student_name=student_name,
+            exam_id=exam_id,
+            db_session=db_session
+        )
+        return report
+    finally:
+        db_session.close()
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Process a video file, check compliance rules, track violation durations, and extract evidence."
+        description="Process candidate video files, check compliance rules, track violation durations, and index by Serial Student ID."
     )
     parser.add_argument(
         "--input", "-i",
-        required=True,
         help="Path to input video file (e.g. video.mp4, video.webm)"
     )
     parser.add_argument(
+        "--dir", "-d",
+        help="Path to directory containing candidate video files for batch processing"
+    )
+    parser.add_argument(
+        "--student-id",
+        help="Student ID or Candidate Identifier (default: auto-generates serial STU-001, STU-002, ...)"
+    )
+    parser.add_argument(
+        "--student-name",
+        help="Candidate / Student full name"
+    )
+    parser.add_argument(
+        "--exam-id",
+        default="MIDTERM-2026",
+        help="Exam / Test Identifier (default: MIDTERM-2026)"
+    )
+    parser.add_argument(
         "--output", "-o",
-        default="./output_analysis",
-        help="Output directory to save report and extracted evidence keyframes (default: ./output_analysis)"
+        help="Output directory (default: ./evidence/candidates/<student_id>/)"
     )
     parser.add_argument(
         "--sample-fps", "-s",
@@ -41,54 +78,66 @@ def main():
         default=10.0,
         help="Maximum allowed candidate missing limit in seconds (default: 10.0)"
     )
-    parser.add_argument(
-        "--max-multiple",
-        type=float,
-        default=3.0,
-        help="Maximum allowed multiple persons limit in seconds (default: 3.0)"
-    )
 
     args = parser.parse_args()
 
+    if not args.input and not args.dir:
+        print("❌ Error: Must specify either --input <video.mp4> or --dir <folder_path>")
+        sys.exit(1)
+
     custom_limits = {
         "PHONE_DETECTED": args.max_phone,
-        "NO_PERSON_DETECTED": args.max_missing,
-        "MULTIPLE_PERSONS": args.max_multiple
+        "NO_PERSON_DETECTED": args.max_missing
     }
 
     print(f"\n=======================================================")
-    print(f"       AI VIDEO CLIP COMPLIANCE PROCESSOR              ")
+    print(f"   CANDIDATE MULTI-ENTRY VIDEO COMPLIANCE PROCESSOR    ")
     print(f"=======================================================")
-    print(f"Input Video File : {args.input}")
-    print(f"Output Directory : {args.output}")
-    print(f"Sampling Rate    : {args.sample_fps} FPS")
-    print(f"Duration Limits  : {custom_limits}")
-    print(f"=======================================================\n")
 
-    try:
-        report = VideoProcessor.process_video_file(
-            video_path=args.input,
-            output_dir=args.output,
+    if args.input:
+        report = process_single_video(
+            input_path=args.input,
+            student_id=args.student_id,
+            student_name=args.student_name,
+            exam_id=args.exam_id,
             sample_fps=args.sample_fps,
-            custom_limits=custom_limits
+            limits=custom_limits,
+            output_dir=args.output
         )
 
-        print("\n================ ANALYSIS COMPLETE ================")
-        print(f"Video Duration   : {report['video_metadata']['duration_formatted']} ({report['video_metadata']['duration_seconds']}s)")
+        print(f"Student ID       : {report['candidate_info']['student_id']}")
+        print(f"Student Name     : {report['candidate_info']['student_name']}")
+        print(f"Exam ID          : {report['candidate_info']['exam_id']}")
+        print(f"Input Video      : {args.input}")
         print(f"Overall Status   : {report['overall_status']}")
         print(f"Limit Exceeded   : {report['overall_limit_exceeded']}")
-        print(f"Total Violations : {report['total_violation_intervals_count']} interval(s)")
-        print("\n--- Cumulative Violation Durations ---")
-        for ev_type, info in report['limit_enforcement'].items():
-            status_str = "EXCEEDED ❌" if info['limit_exceeded'] else "OK ✅"
-            print(f" - {ev_type:<20}: {info['cumulative_duration_seconds']}s / {info['limit_threshold_seconds']}s [{status_str}]")
+        print(f"Report JSON Path : {report['report_file_path']}\n")
 
-        print(f"\nReport Summary saved to : {report['report_file_path']}")
-        print("===================================================\n")
+    elif args.dir:
+        video_files = []
+        for ext in ("*.mp4", "*.webm", "*.avi", "*.mov"):
+            video_files.extend(glob.glob(os.path.join(args.dir, ext)))
 
-    except Exception as e:
-        print(f"\n❌ Error processing video file: {e}")
-        sys.exit(1)
+        print(f"Batch Processing Directory : {args.dir}")
+        print(f"Total Video Files Found    : {len(video_files)}")
+        print(f"=======================================================\n")
+
+        for idx, v_path in enumerate(video_files, start=1):
+            filename = os.path.basename(v_path)
+            s_id = args.student_id
+
+            r = process_single_video(
+                input_path=v_path,
+                student_id=s_id,
+                student_name=args.student_name,
+                exam_id=args.exam_id,
+                sample_fps=args.sample_fps,
+                limits=custom_limits
+            )
+            print(f"[{idx}] Student '{r['candidate_info']['student_id']}' | File: {filename}")
+            print(f"    └── Status: {r['overall_status']} | Duration: {r['video_metadata']['duration_seconds']}s")
+
+        print("\n================ BATCH PROCESSING COMPLETE ================\n")
 
 if __name__ == "__main__":
     main()

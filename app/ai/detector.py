@@ -124,7 +124,13 @@ class AIDetector:
                         "bounding_box": [int(x1), int(y1), int(x2), int(y2)]
                     })
                 detections = self._merge_duplicate_person_boxes(detections)
-                return {"detections": detections}
+
+            # Also check for handheld mobile phones / devices in OpenCV mode
+            phone_dets = self._detect_handheld_gadgets(image)
+            for p in phone_dets:
+                detections.append(p)
+
+            return {"detections": detections}
 
         # 3. Fallback: Skin tone & Head Contour Detection
         skin_box = self._detect_head_skin_contour(image)
@@ -134,6 +140,10 @@ class AIDetector:
                 "confidence": 0.75,
                 "bounding_box": skin_box
             })
+
+        phone_dets = self._detect_handheld_gadgets(image)
+        for p in phone_dets:
+            detections.append(p)
 
         return {"detections": detections}
 
@@ -247,7 +257,44 @@ class AIDetector:
                 return [int(x), int(y), int(x + bw), int(y + bh)]
         except Exception:
             pass
-        return []
+    @staticmethod
+    def _detect_handheld_gadgets(image: np.ndarray) -> List[Dict[str, Any]]:
+        """
+        Computer Vision detector for handheld rectangular devices (smartphones/tablets).
+        Identifies high-contrast rectangular objects with typical phone aspect ratios (1.6 - 2.5).
+        """
+        gadgets = []
+        try:
+            h, w = image.shape[:2]
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+            edges = cv2.Canny(blurred, 40, 140)
+            contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+            total_area = float(w * h)
+            for cnt in contours:
+                area = cv2.contourArea(cnt)
+                # Cell phones typically take 0.5% to 15% of camera frame
+                if area < total_area * 0.004 or area > total_area * 0.15:
+                    continue
+
+                peri = cv2.arcLength(cnt, True)
+                approx = cv2.approxPolyDP(cnt, 0.04 * peri, True)
+
+                # Look for quadrilateral / rectangular shapes
+                if len(approx) == 4:
+                    x, y, bw, bh = cv2.boundingRect(approx)
+                    aspect = max(bw, bh) / float(min(bw, bh)) if min(bw, bh) > 0 else 0
+                    # Smartphone aspect ratio is ~1.6 to 2.5
+                    if 1.55 <= aspect <= 2.55:
+                        gadgets.append({
+                            "object": "cell phone",
+                            "confidence": 0.85,
+                            "bounding_box": [int(x), int(y), int(x + bw), int(y + bh)]
+                        })
+        except Exception:
+            pass
+        return gadgets
 
     @staticmethod
     def annotate_frame(image: np.ndarray, detections: List[Dict[str, Any]]) -> np.ndarray:

@@ -46,3 +46,45 @@ def test_video_processor_analysis():
     finally:
         import shutil
         shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_video_processor_evidence_saving_per_student():
+    """Verifies that keyframe evidence images are physically saved on disk per student_id."""
+    temp_dir = tempfile.mkdtemp(prefix="test_ev_disk_")
+    video_path = os.path.join(temp_dir, "violation_clip.mp4")
+
+    try:
+        height, width = 480, 640
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        out = cv2.VideoWriter(video_path, fourcc, 10, (width, height))
+
+        # Blank frames (will trigger NO_PERSON_DETECTED rule and create evidence keyframe)
+        for _ in range(30):
+            frame = np.zeros((height, width, 3), dtype=np.uint8)
+            out.write(frame)
+        out.release()
+
+        report = VideoProcessor.process_video_file(
+            video_path=video_path,
+            output_dir=None,
+            sample_fps=2.0,
+            custom_limits={"NO_PERSON_DETECTED": 1.0},
+            student_id="STU-VERIFY-007",
+            student_name="James Bond",
+            exam_id="AI-PROCTOR-FINAL"
+        )
+
+        assert report["overall_status"] == "FAILED"
+        assert len(report["evidence_frames"]) > 0
+
+        ev_item = report["evidence_frames"][0]
+        assert ev_item["student_id"] == "STU-VERIFY-007"
+        assert "evidence_url" in ev_item
+        assert "evidence_file" in ev_item
+        assert os.path.exists(ev_item["evidence_file"]), f"Evidence file was not saved to disk: {ev_item['evidence_file']}"
+        assert "STU-VERIFY-007" in ev_item["evidence_file"]
+
+    finally:
+        import shutil
+        shutil.rmtree(temp_dir, ignore_errors=True)
+

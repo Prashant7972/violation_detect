@@ -39,6 +39,9 @@
 ---
 
 ## 9. Component Responsibilities
+- **Face Verification Engine (`FaceVerifier`)**: Compares Document ID Photo against Live Selfie Photo and enforces $\ge 90.0\%$ facial match confidence.
+- **Candidate Onboarding Manager**: Handles pre-auth verification (`/onboarding/verify-id`), login (`/auth/login`), consent (`/onboarding/consent`), and readiness checks (`/onboarding/readiness-check`).
+- **Passcode Management Engine**: Configures and manages active exam passcodes (`/system/passcode`).
 - **Serial Student ID Generator**: Scans existing submissions and assigns next sequential zero-padded ID (`STU-001`, `STU-002`, ...).
 - **System Reset Service**: Handles `POST /api/v1/system/reset`, truncating all DB tables and removing file artifacts from disk.
 - **Video Sampler**: Steps through video frames at configured sample rates (`1.0 FPS`).

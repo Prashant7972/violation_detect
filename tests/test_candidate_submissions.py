@@ -59,3 +59,93 @@ def test_candidate_multi_entry_submission_and_directory():
     finally:
         import shutil
         shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_credentials_lookup_and_login():
+    # 1. Lookup credentials for candidate STU-DEMO (fallback demo)
+    res = client.get("/api/v1/auth/credentials?username=STU-DEMO")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["username"] == "STU-DEMO"
+    assert "password" in data
+    assert data["status"] in ["ISSUED", "DEMO_FALLBACK"]
+
+    # 2. Login with universal emergency/demo passcode ('123456' or 'proctor2026')
+    login_res = client.post(
+        "/api/v1/auth/login",
+        json={"username": "STU-DEMO", "password": "proctor2026"}
+    )
+    assert login_res.status_code == 200
+    login_data = login_res.json()
+    assert login_data["username"] == "STU-DEMO"
+    assert login_data["status"] == "AUTHENTICATED"
+
+    # 3. Also login with '123456'
+    login_res2 = client.post(
+        "/api/v1/auth/login",
+        json={"username": "STU-DEMO", "password": "123456"}
+    )
+    assert login_res2.status_code == 200
+
+
+def test_exam_submission_and_certificate():
+    payload = {
+        "student_id": "STU-TEST",
+        "student_name": "Test Candidate",
+        "exam_id": "MIDTERM-2026",
+        "score": 5,
+        "total_questions": 5,
+        "answers": {"1": "A", "2": "A", "3": "A", "4": "A", "5": "A"},
+        "face_match_percentage": "94.2%",
+        "proctoring_status": "PASSED",
+        "phone_violations": 0.0,
+        "multiple_person_violations": 0.0
+    }
+    sub_res = client.post("/api/v1/exam/submit", json=payload)
+    assert sub_res.status_code == 200
+    data = sub_res.json()
+    assert data["student_id"] == "STU-TEST"
+    assert data["percentage"] == 100.0
+    assert data["overall_status"] == "PASSED"
+    assert data["certificate_id"].startswith("CERT-AI-")
+
+    # Verify submission appears in candidate directory
+    dir_res = client.get("/api/v1/candidates?student_id=STU-TEST")
+    assert dir_res.status_code == 200
+    dir_data = dir_res.json()
+    assert dir_data["total_submissions"] >= 1
+    found = any(s["student_id"] == "STU-TEST" for s in dir_data["submissions"])
+    assert found is True
+
+
+def test_live_scanner_and_student_evidence_storage():
+    import base64
+    from app.config import settings
+
+    # 1. Test clean frame
+    clean_frame = np.zeros((240, 320, 3), dtype=np.uint8)
+    # Draw simple face-like circle
+    cv2.circle(clean_frame, (160, 120), 40, (200, 200, 200), -1)
+    _, buffer = cv2.imencode('.jpg', clean_frame)
+    b64_clean = "data:image/jpeg;base64," + base64.b64encode(buffer).decode('utf-8')
+
+    res_clean = client.post("/api/v1/sessions/scan-frame", json={
+        "frame_data": b64_clean,
+        "student_id": "STU-SCAN-99"
+    })
+    assert res_clean.status_code == 200
+    data_clean = res_clean.json()
+    assert "status" in data_clean
+    assert "phone_detected" in data_clean
+    assert "laptop_detected" in data_clean
+    assert "multiple_persons" in data_clean
+
+    # 2. Test candidate evidence query endpoint
+    ev_res = client.get("/api/v1/candidates/STU-SCAN-99/evidence")
+    assert ev_res.status_code == 200
+    ev_data = ev_res.json()
+    assert ev_data["student_id"] == "STU-SCAN-99"
+    assert "evidence_frames" in ev_data
+    assert isinstance(ev_data["evidence_frames"], list)
+
+

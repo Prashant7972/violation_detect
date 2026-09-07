@@ -38,14 +38,23 @@ os.makedirs(static_dir, exist_ok=True)
 app.mount("/static", StaticFiles(directory=static_dir, html=True), name="static")
 app.mount("/evidence", StaticFiles(directory=settings.EVIDENCE_DIR), name="evidence")
 
-@app.get("/")
+from fastapi.responses import RedirectResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class NoCacheStaticMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        if request.url.path.startswith("/static/"):
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+        return response
+
+app.add_middleware(NoCacheStaticMiddleware)
+
+@app.api_route("/", methods=["GET", "HEAD"])
 def root():
-    return {
-        "title": settings.PROJECT_NAME,
-        "docs_url": "/docs",
-        "web_ui": "/static/index.html",
-        "status": "running"
-    }
+    return RedirectResponse(url="/static/index.html")
 
 if __name__ == "__main__":
     import uvicorn

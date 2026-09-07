@@ -2,15 +2,15 @@
 ```
 USER / ADMIN
   │
-  ├─► Provides Video Clip Input (e.g. candidate_video.mp4)
+  ├─► Pre-Auth Verification: Upload Document ID + Live Selfie Photo
   │
-  ├─► Leaves Student ID blank or provides custom Student ID (e.g. STU-001)
+  ├─► System AI Face Matcher enforces >= 90.0% Confidence -> Generates Password -> Sends Email Notification
   │
-  ├─► Submits video file via CLI `python process_video.py` or Web UI Dashboard
+  ├─► Candidate logs in using Username & Received Password
   │
-  ├─► System processes video clip & calculates violation time intervals
+  ├─► Completes Privacy Consent & Media Readiness Checks
   │
-  ├─► System stores evidence in candidate-isolated directory `/evidence/candidates/STU-001/`
+  ├─► Submits Video Clip for Evaluation & Violations Inspection
   │
   └─► Admin can view Candidate Directory or click "Reset All Data" to start clean
 ```

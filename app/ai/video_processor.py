@@ -150,6 +150,10 @@ class VideoProcessor:
                         kf_path = os.path.join(evidence_dir, kf_name)
                         cv2.imwrite(kf_path, annotated)
 
+                        abs_evidence_dir = os.path.abspath(settings.EVIDENCE_DIR)
+                        rel_path = os.path.relpath(os.path.abspath(kf_path), abs_evidence_dir)
+                        evidence_url = f"/evidence/{rel_path.replace(os.sep, '/')}"
+
                         active_intervals[event_type] = {
                             "event_type": event_type,
                             "rule_triggered": rule["rule_triggered"],
@@ -159,6 +163,8 @@ class VideoProcessor:
                             "end_timestamp": formatted_time,
                             "peak_confidence": rule["confidence"],
                             "evidence_file": kf_path,
+                            "evidence_url": evidence_url,
+                            "flagged_objects": [d.get("object", "violation") for d in rule.get("flagged_detections", [])],
                             "sample_count": 1
                         }
                     else:
@@ -168,6 +174,12 @@ class VideoProcessor:
                         interval["sample_count"] += 1
                         if rule["confidence"] > interval["peak_confidence"]:
                             interval["peak_confidence"] = rule["confidence"]
+                            # Overwrite keyframe with higher-confidence, clearer annotated frame
+                            try:
+                                annotated_peak = AIDetector.annotate_frame(frame, detections)
+                                cv2.imwrite(interval["evidence_file"], annotated_peak)
+                            except Exception as write_err:
+                                logger.warning(f"Failed to update peak keyframe: {write_err}")
 
                 ended_keys = [k for k in active_intervals if k not in rule_types_present]
                 for k in ended_keys:
@@ -242,7 +254,24 @@ class VideoProcessor:
             "cumulative_durations": cumulative_durations,
             "limit_enforcement": limit_checks,
             "total_violation_intervals_count": len(completed_intervals),
-            "violation_intervals": completed_intervals
+            "violation_intervals": completed_intervals,
+            "evidence_frames": [
+                {
+                    "student_id": student_id,
+                    "student_name": student_name,
+                    "exam_id": exam_id,
+                    "event_type": inv["event_type"],
+                    "rule_triggered": inv["rule_triggered"],
+                    "timestamp": inv["start_timestamp"],
+                    "timestamp_sec": inv["start_time_sec"],
+                    "duration_seconds": inv.get("duration_seconds", 0.0),
+                    "peak_confidence": inv["peak_confidence"],
+                    "evidence_url": inv.get("evidence_url"),
+                    "evidence_file": inv.get("evidence_file"),
+                    "flagged_objects": inv.get("flagged_objects", [])
+                }
+                for inv in completed_intervals if inv.get("evidence_file") and os.path.exists(inv.get("evidence_file", ""))
+            ]
         }
 
         report_json_path = os.path.join(output_dir, "analysis_report.json")

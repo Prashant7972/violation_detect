@@ -1,0 +1,76 @@
+# ==============================================================================
+# Git Ignore Configuration - AI Video File Analysis & Monitoring System
+# ==============================================================================
+
+# 1. Python Cache & Compiled Files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.nox/
+.hypothesis/
+
+# 2. Virtual Environments
+venv/
+venv*/
+env/
+env*/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# 3. SQLite Database Files
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+app.db
+
+# 4. Evidence Artifacts & Generated Video Analysis Outputs
+evidence/*
+!evidence/.gitkeep
+extracted_evidence/
+*.jpg
+*.jpeg
+*.png
+analysis_report.json
+
+# 5. Environment Variables & Secret Files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 6. Log & Temporary Files
+*.log
+logs/
+temp/
+tmp/
+.system_generated/
+
+# 7. AI Model Weights & Cache
+*.pt
+*.onnx
+*.engine
+yolov8n.pt
+
+# 8. Operating System & IDE Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE Settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

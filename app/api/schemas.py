@@ -1,6 +1,6 @@
 import datetime
 from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, model_validator
 
 class CreateSessionRequest(BaseModel):
     user_id: str = Field(..., json_schema_extra={"example": "user-456"}, description="Identifier of the user or candidate")
@@ -65,3 +65,131 @@ class CandidateListResponse(BaseModel):
 class BatchProcessResponse(BaseModel):
     total_files_processed: int
     submissions: List[Dict[str, Any]]
+
+# Pre-Authentication Identity Verification & Login Schemas
+class VerifyIDRequest(BaseModel):
+    username: Optional[str] = Field(None, description="Candidate Username / Student ID")
+    email: str = Field(..., description="Candidate Email Address for Password Notification")
+    document_id_b64: str = Field(..., description="Base64 encoded Document ID Photo")
+    live_selfie_b64: str = Field(..., description="Base64 encoded Live Selfie Photo")
+    document_type: Optional[str] = Field("aadhaar", description="Document type: 'aadhaar', 'pan', 'driving_license', 'passport'")
+
+class VerifyIDResponse(BaseModel):
+    status: str = "VERIFIED"
+    match_confidence: float = Field(..., description="Facial match confidence score (>= 0.70 required)")
+    match_percentage: str = Field(..., description="Facial match percentage (e.g. 94.5%)")
+    document_type: Optional[str] = "aadhaar"
+    email_sent_to: str
+    password_issued: Optional[str] = None
+    document_status: Optional[str] = "VALID"
+    document_warning: Optional[str] = None
+    document_validation: Optional[Dict[str, Any]] = None
+    message: str
+
+class LoginRequest(BaseModel):
+    username: str = Field(..., description="Candidate Username")
+    password: str = Field(..., description="Authentication Password delivered via Email")
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    username: str
+    status: str = "AUTHENTICATED"
+    email_sent: bool = True
+    email_sent_to: Optional[str] = None
+    message: str = "Credentials matched successfully. Access token issued and confirmation email dispatched to candidate."
+
+class ConsentRequest(BaseModel):
+    session_token: str
+    consent_agreed: bool = Field(..., description="Must be True to proceed")
+
+class ConsentResponse(BaseModel):
+    status: str = "CONSENT_RECORDED"
+    message: str
+    timestamp: datetime.datetime
+
+class ReadinessCheckRequest(BaseModel):
+    session_token: str
+    media_api_supported: bool = True
+    file_api_supported: bool = True
+    screen_resolution_valid: bool = True
+    identity_photo_provided: bool = True
+
+class ReadinessCheckResponse(BaseModel):
+    status: str = "READY_FOR_SESSION"
+    message: str
+    checks_passed: Dict[str, bool]
+
+class CandidateCredentialsResponse(BaseModel):
+    username: str
+    email: str
+    password: str
+    status: str = "ISSUED"
+
+class ExamSubmissionRequest(BaseModel):
+    student_id: str = Field(..., description="Candidate username or ID")
+    student_name: Optional[str] = Field("Candidate", description="Full name")
+    exam_id: Optional[str] = Field("MIDTERM-2026", description="Exam ID")
+    score: int = Field(..., description="Calculated test score")
+    total_questions: int = Field(5, description="Total questions in exam")
+    answers: Dict[str, Any] = Field(default_factory=dict, description="Submitted answers")
+    face_match_percentage: Optional[str] = Field("93.8%", description="Face match percentage")
+    proctoring_status: Optional[str] = Field("PASSED", description="Proctoring verdict")
+    phone_violations: Optional[float] = Field(0.0, description="Phone violation seconds")
+    multiple_person_violations: Optional[float] = Field(0.0, description="Multiple persons violation seconds")
+
+class ExamSubmissionResponse(BaseModel):
+    submission_id: str
+    student_id: str
+    exam_id: str
+    score: int
+    total_questions: int
+    percentage: float
+    proctoring_status: str
+    overall_status: str
+    certificate_id: str
+    submitted_at: datetime.datetime
+    message: str
+
+class ValidateDocumentRequest(BaseModel):
+    document_id_b64: str = Field(..., description="Base64 encoded document ID photo")
+    document_type: Optional[str] = Field("aadhaar", description="Selected document type: aadhaar, pan, driving_license, passport")
+    selected_type: Optional[str] = Field(None, description="Alias for document_type")
+
+    @model_validator(mode="before")
+    @classmethod
+    def resolve_doc_type(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            chosen = data.get("selected_type") or data.get("document_type") or "aadhaar"
+            data["document_type"] = chosen
+            data["selected_type"] = chosen
+        return data
+
+class ValidateDocumentResponse(BaseModel):
+    status: str = Field(..., description="VALID, MISMATCH, INVALID, BLURRY, or NOT_AN_ID")
+    is_match: bool
+    detected_type: str
+    selected_type: str
+    detected_label: str
+    selected_label: str
+    warning_message: str
+    clarity_score: float
+    checks: Dict[str, Any]
+
+class ScanLiveFrameRequest(BaseModel):
+    student_id: Optional[str] = Field("STU-001", description="Candidate / Student ID")
+    frame_data: str = Field(..., description="Base64 encoded webcam JPEG image string")
+
+class ScanLiveFrameResponse(BaseModel):
+    status: str = "CLEAN"
+    phone_detected: bool = False
+    laptop_detected: bool = False
+    multiple_persons: bool = False
+    person_present: bool = True
+    detections: List[Dict[str, Any]] = []
+    violations: List[str] = []
+    evidence_url: Optional[str] = None
+    summary_message: str
+
+
+

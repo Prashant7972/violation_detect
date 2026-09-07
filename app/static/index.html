@@ -3,167 +3,1015 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Candidate Multi-Entry Video Compliance System</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>AI Candidate Interview & Examination Proctoring Dashboard</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="styles.css?v=2.2">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="logo">
-                <span class="pulse-icon"></span>
-                <h1>Candidate Multi-Entry Compliance Dashboard</h1>
+    <div class="saas-container">
+        
+        <!-- Left Sidebar Navigation (Inspired by Reference UI) -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">A</div>
             </div>
-            <div class="header-actions">
-                <button class="btn btn-danger-outline" id="resetSystemBtn">🗑️ Reset All Data & Storage</button>
-                <span class="status-badge stopped" id="statusBadge">Ready for Submissions</span>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" id="navExamDeviceBtn" title="Candidate Exam Device">
+                    <span class="nav-icon">🖥️</span>
+                </a>
+                <a href="#" class="nav-item" id="navExaminerBtn" title="Examiner Proctoring Dashboard">
+                    <span class="nav-icon">🎥</span>
+                </a>
+                <a href="#" class="nav-item" id="navCandidatesBtn" title="Candidates Directory">
+                    <span class="nav-icon">👥</span>
+                </a>
+                <a href="#" class="nav-item" id="navRulesBtn" title="Compliance Rules">
+                    <span class="nav-icon">📜</span>
+                </a>
+                <a href="#" class="nav-item" id="navHardwareBtn" title="Device Diagnostics">
+                    <span class="nav-icon">⚙️</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="nav-item btn-icon-reset" id="resetSystemBtn" title="Reset System">
+                    <span class="nav-icon">🗑️</span>
+                </button>
             </div>
-        </header>
+        </aside>
 
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <div class="grid-2col">
+        <!-- Main Workspace Area -->
+        <div class="main-wrapper">
+            
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="navbar-breadcrumb">
+                    <span id="navSectionBreadcrumb">Exam Device</span> &rsaquo; <span class="active-candidate" id="breadCandidateName">STU-001</span>
+                </div>
+                <div class="navbar-actions">
+                    <div class="view-switcher-group" id="viewSwitcherGroup">
+                        <button type="button" class="btn-view-toggle active" id="viewExamPortalBtn">🖥️ Candidate Exam Device</button>
+                        <button type="button" class="btn-view-toggle" id="viewExaminerDashBtn">📊 Examiner Dashboard</button>
+                    </div>
+                    <div class="live-hardware-badges" id="liveHardwareBadges">
+                        <span class="hw-badge cam-active">🟢 CAM ACTIVE</span>
+                        <span class="hw-badge mic-active">🎙️ MIC ACTIVE</span>
+                        <span class="hw-badge net-active">🌐 NETWORK STABLE</span>
+                    </div>
+                    <button class="btn btn-secondary" id="reopenOnboardingBtn">🔑 Candidate Onboarding Wizard</button>
+                    <span class="status-badge passed" id="statusBadge">Exam Device Active</span>
+                </div>
+            </header>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-content" id="dashboardContent" style="display: none;">
                 
-                <!-- Left Column: Student Metadata Form & Video Upload -->
-                <section class="card upload-card">
-                    <div class="card-header">
-                        <h2>New Candidate Submission</h2>
-                        <span class="badge">Serial Auto-ID (STU-001)</span>
+                <!-- Candidate Header Profile Card (Inspired by Reference UI Image 2) -->
+                <div class="candidate-profile-banner card">
+                    <div class="profile-header-gradient">
+                        <div class="profile-avatar-wrapper">
+                            <img id="candidateAvatarImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' fill='%236366f1'/><circle cx='50' cy='40' r='20' fill='%23ffffff'/><circle cx='50' cy='90' r='35' fill='%23ffffff'/></svg>" alt="Candidate Avatar">
+                            <span class="verified-badge-pill" id="verifiedPill">Verified ✅</span>
+                        </div>
                     </div>
+                    <div class="profile-details-body">
+                        <div class="profile-title-row">
+                            <h2 id="profCandidateName">STU-001 Candidate</h2>
+                            <span class="role-pill">Software Engineer Candidate</span>
+                        </div>
+                        
+                        <div class="skills-row">
+                            <span class="skill-tag">Python</span>
+                            <span class="skill-tag">FastAPI</span>
+                            <span class="skill-tag">OpenCV</span>
+                            <span class="skill-tag">AI Proctoring</span>
+                            <span class="skill-tag">YOLOv8</span>
+                        </div>
 
-                    <!-- Student Identifier Form -->
-                    <div class="student-form">
-                        <h3>Candidate & Exam Identifiers</h3>
-                        <div class="input-grid">
-                            <div class="input-group">
-                                <label for="studentIdInput">Student / Candidate ID <small>(Leave blank for auto-serial STU-001, STU-002)</small>:</label>
-                                <input type="text" id="studentIdInput" placeholder="Auto-assigned (e.g. STU-001)">
+                        <div class="meta-grid">
+                            <div class="meta-card">
+                                <span class="meta-label">Email Address</span>
+                                <strong class="meta-val" id="profEmail">candidate@example.com</strong>
                             </div>
-                            <div class="input-group">
-                                <label for="studentNameInput">Candidate Full Name:</label>
-                                <input type="text" id="studentNameInput" placeholder="e.g. John Doe">
+                            <div class="meta-card">
+                                <span class="meta-label">Exam / Interview ID</span>
+                                <strong class="meta-val" id="profExamId">MIDTERM-2026</strong>
                             </div>
-                            <div class="input-group">
-                                <label for="examIdInput">Exam / Test ID:</label>
-                                <input type="text" id="examIdInput" value="MIDTERM-2026" placeholder="e.g. MIDTERM-2026">
+                            <div class="meta-card">
+                                <span class="meta-label">Face Match Score</span>
+                                <strong class="meta-val highlight-green" id="profFaceScore">93.8% Match</strong>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- File Dropzone -->
-                    <div class="drop-zone" id="dropZone">
-                        <div class="drop-zone-content">
-                            <span class="upload-icon">📁</span>
-                            <p class="drop-text">Drag & Drop candidate video file(s) here</p>
-                            <span class="or-divider">or</span>
-                            <label for="fileInput" class="btn btn-primary file-select-btn">Choose Video File(s)</label>
-                            <input type="file" id="fileInput" accept="video/mp4,video/webm,video/avi,video/quicktime" multiple hidden>
-                        </div>
-                        <div class="file-info" id="fileInfo" style="display: none;">
-                            <div class="file-details">
-                                <span class="file-name" id="fileNameText">video.mp4</span>
-                                <span class="file-size" id="fileSizeText">12.4 MB</span>
+                <!-- Compliance & Analytics Gauges Cards (Inspired by Reference UI Image 2) -->
+                <div class="analytics-metrics-grid">
+                    
+                    <div class="metric-card card">
+                        <span class="metric-label">Ability / Compliance Score</span>
+                        <div class="gauge-container">
+                            <div class="arc-gauge" id="arcGauge">
+                                <span class="gauge-number" id="gaugeScore">100%</span>
                             </div>
                         </div>
+                        <span class="metric-sub text-passed">Zero Violations Detected</span>
                     </div>
 
-                    <!-- Video Preview Player -->
-                    <div class="video-preview-box" id="videoPreviewBox" style="display: none;">
-                        <video id="videoPreview" controls></video>
+                    <div class="metric-card card">
+                        <span class="metric-label">Mobile Phone Usage</span>
+                        <div class="metric-big-num" id="metricPhoneVal">0.0s</div>
+                        <span class="metric-sub text-muted">Zero Tolerance Policy</span>
                     </div>
 
-                    <!-- Sampling & Limit Settings -->
-                    <div class="config-panel">
-                        <h3>Compliance Limits Settings (0.0s = Zero Tolerance)</h3>
-                        <div class="config-grid">
-                            <div class="input-group">
-                                <label for="sampleFpsSelect">Sampling Frequency:</label>
-                                <select id="sampleFpsSelect">
-                                    <option value="0.5">0.5 FPS (1 frame / 2s)</option>
-                                    <option value="1.0" selected>1.0 FPS (1 frame / sec)</option>
-                                    <option value="2.0">2.0 FPS (2 frames / sec)</option>
-                                </select>
+                    <div class="metric-card card">
+                        <span class="metric-label">Multi-Person Intrusion</span>
+                        <div class="metric-big-num" id="metricPersonsVal">0.0s</div>
+                        <span class="metric-sub text-muted">Zero Tolerance Policy</span>
+                    </div>
+
+                </div>
+
+                <!-- Workspace Grid: Live Video Proctoring Stream & Examiner Directory -->
+                <div class="workspace-grid-2col">
+                    
+                    <!-- Left: Live Proctor Video & Upload Panel -->
+                    <div class="card live-proctor-card">
+                        <div class="card-header">
+                            <h3>Live Exam Proctoring Stream</h3>
+                            <span class="badge badge-passed">REC ACTIVE</span>
+                        </div>
+                        
+                        <div class="proctor-video-wrapper">
+                            <video id="activeExamWebcam" autoplay playsinline muted></video>
+                            <div class="proctor-hud">
+                                <span class="hud-item" id="hudCandidateName">Candidate: STU-001</span>
+                                <span class="hud-item hud-clean" id="hudStatus">STATUS: CLEAN</span>
                             </div>
-                            <div class="input-group">
-                                <label for="maxPhoneInput">Phone Limit (sec):</label>
-                                <input type="number" id="maxPhoneInput" value="0.0" step="0.5" min="0">
+                        </div>
+
+                        <!-- Drop Zone -->
+                        <div class="drop-zone" id="dropZone">
+                            <div class="drop-zone-content">
+                                <span class="upload-icon">📁</span>
+                                <p class="drop-text">Drag & Drop recorded exam video clip here</p>
+                                <span class="or-divider">or</span>
+                                <label for="fileInput" class="btn btn-primary file-select-btn">Choose Exam Video File</label>
+                                <input type="file" id="fileInput" accept="video/mp4,video/webm,video/avi,video/quicktime" multiple hidden>
                             </div>
-                            <div class="input-group">
-                                <label for="maxPersonsInput">Multi-Person Limit (sec):</label>
-                                <input type="number" id="maxPersonsInput" value="0.0" step="0.5" min="0">
+                            <div class="file-info" id="fileInfo" style="display: none;">
+                                <div class="file-details">
+                                    <span class="file-name" id="fileNameText">video.mp4</span>
+                                    <span class="file-size" id="fileSizeText">12.4 MB</span>
+                                </div>
                             </div>
-                            <div class="input-group">
-                                <label for="maxMissingInput">Missing Limit (sec):</label>
-                                <input type="number" id="maxMissingInput" value="5.0" step="0.5" min="0">
+                        </div>
+
+                        <!-- Video Preview Player -->
+                        <div class="video-preview-box" id="videoPreviewBox" style="display: none;">
+                            <video id="videoPreview" controls></video>
+                        </div>
+
+                        <button id="analyzeBtn" class="btn btn-success analyze-btn" disabled>
+                            <span>⚡ Process & Submit Video Recording for AI Evaluation</span>
+                        </button>
+                    </div>
+
+                    <!-- Right: Examiner Directory Table -->
+                    <div class="card candidate-directory-card">
+                        <div class="card-header">
+                            <h3>Examiner Candidate Directory</h3>
+                            <button class="btn btn-secondary refresh-btn" id="refreshCandidatesBtn">🔄 Refresh</button>
+                        </div>
+
+                        <div class="search-bar-box">
+                            <input type="text" id="searchStudentId" placeholder="Search Candidate Username, Name, or Exam ID...">
+                            <select id="filterStatus">
+                                <option value="">All Statuses</option>
+                                <option value="PASSED">Passed Only</option>
+                                <option value="FAILED">Failed Only</option>
+                            </select>
+                        </div>
+
+                        <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                            <div class="spinner"></div>
+                            <p id="loadingText">Processing Video Frame Sampling & Violations...</p>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="candidate-table" id="candidateTable">
+                                <thead>
+                                    <tr>
+                                        <th>Candidate</th>
+                                        <th>Exam ID</th>
+                                        <th>Clip</th>
+                                        <th>Phone Viol.</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="candidateTableBody">
+                                    <tr>
+                                        <td colspan="6" class="empty-table-cell">No candidate submissions recorded yet. Upload a video on the left to evaluate.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Inspection Drawer -->
+                        <div class="inspection-drawer" id="inspectionDrawer" style="display: none;">
+                            <div class="drawer-header">
+                                <h3 id="inspectTitle">Candidate Report: STU-001</h3>
+                                <button class="close-drawer-btn" id="closeDrawerBtn">✖ Close</button>
                             </div>
+                            <div class="drawer-body" id="drawerBody"></div>
                         </div>
                     </div>
 
-                    <!-- Process Submit Button -->
-                    <button id="analyzeBtn" class="btn btn-success analyze-btn" disabled>
-                        <span>⚡ Process Candidate Video Entry</span>
-                    </button>
-                </section>
-
-                <!-- Right Column: Examiner Candidate Directory & Detailed Inspector -->
-                <section class="card results-card">
-                    <div class="card-header">
-                        <h2>Examiner Candidate Directory</h2>
-                        <button class="btn btn-secondary refresh-btn" id="refreshCandidatesBtn">🔄 Refresh</button>
-                    </div>
-
-                    <!-- Search & Filter Controls -->
-                    <div class="search-bar-box">
-                        <input type="text" id="searchStudentId" placeholder="Search by Student ID, Name, or Exam ID...">
-                        <select id="filterStatus">
-                            <option value="">All Statuses</option>
-                            <option value="PASSED">Passed Only</option>
-                            <option value="FAILED">Failed Only</option>
-                        </select>
-                    </div>
-
-                    <!-- Loading Spinner Overlay -->
-                    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
-                        <div class="spinner"></div>
-                        <p id="loadingText">Processing Candidate Video & Checking Violation Timelines...</p>
-                    </div>
-
-                    <!-- Candidate Directory Table -->
-                    <div class="table-container">
-                        <table class="candidate-table" id="candidateTable">
-                            <thead>
-                                <tr>
-                                    <th>Student ID / Name</th>
-                                    <th>Exam ID</th>
-                                    <th>Video Clip</th>
-                                    <th>Phone Viol.</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="candidateTableBody">
-                                <tr>
-                                    <td colspan="6" class="empty-table-cell">No candidate submissions recorded yet. Upload a video on the left to start.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Detailed Submission Inspection Drawer -->
-                    <div class="inspection-drawer" id="inspectionDrawer" style="display: none;">
-                        <div class="drawer-header">
-                            <h3 id="inspectTitle">Candidate Report: STU-001</h3>
-                            <button class="close-drawer-btn" id="closeDrawerBtn">✖ Close</button>
-                        </div>
-                        <div class="drawer-body" id="drawerBody"></div>
-                    </div>
-                </section>
+                </div>
 
             </div>
-        </main>
+
+            <!-- Candidate Proctored Examination Device Portal (Active Exam Video Submission & Evaluation Studio) -->
+            <div class="exam-device-content" id="examDeviceContainer">
+                
+                <!-- Exam Header Card -->
+                <div class="exam-header-card card">
+                    <div class="exam-header-left">
+                        <div class="exam-brand-badge">NTA SECURE CBT</div>
+                        <div>
+                            <h2 class="exam-title">AI Examination Recording & Proctoring Evaluation Portal 2026</h2>
+                            <div class="exam-meta-pills">
+                                <span class="exam-meta-pill">Candidate: <strong id="examCandidateName">STU-001</strong></span>
+                                <span class="exam-meta-pill">Exam ID: <strong id="examIdBadge">MIDTERM-2026</strong></span>
+                                <span class="exam-meta-pill">Device: <strong id="examDeviceBadge">DEV-LINUX-7112</strong></span>
+                                <span class="exam-meta-pill highlight">Face Match: <strong id="examFaceScoreBadge">93.8% Verified</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="exam-header-right">
+                        <div class="exam-timer-box">
+                            <span class="timer-label">SESSION STATUS</span>
+                            <div class="timer-display" style="font-size: 1.1rem; color: #34d399;" id="examSessionStatusBadge">REC ACTIVE 🟢</div>
+                        </div>
+                        <button type="button" class="btn btn-secondary switch-dash-btn" id="examSwitchToExaminerBtn" title="Switch to Examiner Supervision Dashboard">
+                            📊 Examiner Dashboard
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Exam Workspace 2-Column: Left = Video Submission & Evidence Gallery, Right = Live Proctor HUD -->
+                <div class="exam-workspace-grid">
+                    
+                    <!-- Left: Candidate Exam Video Submission & Violation Evaluation Studio -->
+                    <div class="card exam-paper-card candidate-video-eval-card">
+                        <div class="exam-paper-header">
+                            <div class="q-progress-info">
+                                <span class="q-current-tag">📹 Candidate Exam Video Submission & Evaluation Studio</span>
+                                <span class="q-points-tag">AI Object & Person Violation Detection Active</span>
+                            </div>
+                        </div>
+
+                        <div class="exam-video-studio-body">
+                            <p class="studio-desc">
+                                Submit your examination video recording(s) for AI compliance evaluation. You can upload a <strong>single video clip or multiple videos in batch</strong>. The computer vision engine will inspect all frames for violations (mobile phones, laptops, secondary persons, absent candidate) and generate <strong>annotated evidence keyframes</strong> with detected object bounding boxes.
+                            </p>
+
+                            <!-- Dropzone for Single or Multiple Videos -->
+                            <div class="candidate-dropzone" id="candidateDropZone">
+                                <div class="candidate-dropzone-inner">
+                                    <span class="upload-icon-large">🎬</span>
+                                    <p class="dropzone-main-text">Drag & Drop recorded exam video(s) here</p>
+                                    <p class="dropzone-sub-text">Supports single video or multiple batch recordings (MP4, WebM, AVI, MOV)</p>
+                                    <label for="candidateVideoInput" class="btn btn-primary file-select-btn" style="margin-top: 10px; cursor: pointer;">
+                                        📂 Choose Exam Video File(s)
+                                    </label>
+                                    <input type="file" id="candidateVideoInput" accept="video/mp4,video/webm,video/avi,video/quicktime,video/mkv" multiple hidden>
+                                </div>
+                            </div>
+
+                            <!-- Selected Files Tray (Lists all selected video clips) -->
+                            <div class="selected-files-tray" id="selectedFilesTray" style="display: none;">
+                                <div class="tray-header">
+                                    <strong id="selectedFilesCountText">0 Videos Selected</strong>
+                                    <button type="button" class="btn btn-sm btn-secondary" id="clearSelectedFilesBtn">Clear Selection</button>
+                                </div>
+                                <div class="selected-files-list" id="selectedFilesList">
+                                    <!-- Populated dynamically with file chips -->
+                                </div>
+                            </div>
+
+                            <!-- Evaluation Controls & Submit Button -->
+                            <div class="eval-controls-bar">
+                                <div class="control-group">
+                                    <label for="evalSampleFps">Sampling Rate:</label>
+                                    <select id="evalSampleFps" class="form-select-sm">
+                                        <option value="1.0" selected>1.0 FPS (Standard 1 frame/sec)</option>
+                                        <option value="2.0">2.0 FPS (High Sensitivity 2 frames/sec)</option>
+                                        <option value="0.5">0.5 FPS (Fast 1 frame/2 sec)</option>
+                                    </select>
+                                </div>
+                                <button type="button" class="btn btn-success eval-submit-btn" id="evalCandidateVideosBtn" disabled>
+                                    <span>⚡ Process & Submit Video(s) for AI Violation Evaluation</span>
+                                </button>
+                            </div>
+
+                            <!-- Animated Progress / Status Bar -->
+                            <div class="eval-progress-box" id="evalProgressBox" style="display: none;">
+                                <div class="progress-bar-track">
+                                    <div class="progress-bar-fill" id="evalProgressBarFill"></div>
+                                </div>
+                                <div class="progress-status-row">
+                                    <span class="spinner-inline"></span>
+                                    <span id="evalProgressStatusText">Analyzing video frames & evaluating compliance rules...</span>
+                                </div>
+                            </div>
+
+                            <!-- Evaluation Results & Evidence Frames Gallery -->
+                            <div class="evidence-gallery-section" id="evidenceGallerySection" style="display: none;">
+                                <div class="results-summary-card" id="resultsSummaryCard">
+                                    <!-- Populated dynamically with overall verdict and violation breakdown -->
+                                </div>
+
+                                <div class="gallery-heading-row">
+                                    <div>
+                                        <h3 class="gallery-title">📸 Stored Violation Evidence Frames</h3>
+                                        <p class="gallery-sub">
+                                            Annotated frames saved on disk showing highlighted bounding boxes around violated objects (Red: Mobile Phone, Magenta: Laptop, Amber: Multiple Persons).
+                                        </p>
+                                    </div>
+                                    <span class="badge badge-passed" id="evidenceCountBadge">0 Evidence Frames</span>
+                                </div>
+
+                                <!-- Grid of Evidence Cards -->
+                                <div class="evidence-cards-grid" id="evidenceCardsGrid">
+                                    <!-- Populated dynamically by app.js -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Candidate Live Proctoring HUD -->
+                    <div class="card exam-proctor-hud-card">
+                        <div class="card-header">
+                            <h3>Live Candidate Proctor HUD</h3>
+                            <span class="badge badge-passed">REC & PROCTOR ON</span>
+                        </div>
+
+                        <div class="proctor-video-container">
+                            <video id="examPortalWebcam" autoplay playsinline muted></video>
+                            <div class="hud-target-oval"></div>
+                            <div class="proctor-scanline"></div>
+                            <div class="proctor-hud-overlay">
+                                <div class="hud-stat-pill" id="hudFacePresence">🟢 FACE DETECTED & CENTERED</div>
+                                <div class="hud-stat-pill" id="hudGazeStatus">👁️ SCREEN GAZE: NORMAL</div>
+                            </div>
+                        </div>
+
+                        <!-- Live Audio Meter Indicator -->
+                        <div class="hud-audio-monitor">
+                            <div class="hud-audio-header">
+                                <span class="audio-label">🎙️ Live Microphone Input Level:</span>
+                                <span class="audio-status-tag" id="hudAudioStatusTag">ACTIVE</span>
+                            </div>
+                            <div class="hud-audio-track">
+                                <div class="hud-audio-bar" id="hudAudioBar"></div>
+                            </div>
+                        </div>
+
+                        <!-- Dedicated Real-Time Mobile Device & Gadget Shield Module -->
+                        <div class="hud-mobile-shield-card" id="hudMobileScannerCard">
+                            <div class="hud-shield-header">
+                                <div class="hud-shield-title">
+                                    <span class="scanner-pulse-dot" id="mobileScannerPulse"></span>
+                                    <span class="shield-badge-title">📱 REAL-TIME MOBILE & DEVICE SHIELD</span>
+                                </div>
+                                <span class="shield-status-pill clean" id="mobileScannerStatusBadge">ACTIVE SCANNING</span>
+                            </div>
+                            <p class="hud-shield-desc">
+                                Live AI shield continuously monitoring workspace for unauthorized mobile phones, secondary displays, and room intruders.
+                            </p>
+                            
+                            <div class="shield-meters-grid">
+                                <div class="tri-meter-chip" id="chipPhoneScanner">
+                                    <div class="chip-icon">📱</div>
+                                    <div class="chip-info">
+                                        <span class="chip-title">Mobile Phone Scanner</span>
+                                        <strong class="chip-val text-passed" id="chipPhoneVal">0 Detected (Clean)</strong>
+                                    </div>
+                                    <div class="chip-status-dot clean" id="chipPhoneDot"></div>
+                                </div>
+                                <div class="tri-meter-chip" id="chipLaptopScanner">
+                                    <div class="chip-icon">💻</div>
+                                    <div class="chip-info">
+                                        <span class="chip-title">Secondary Laptop / Screen</span>
+                                        <strong class="chip-val text-passed" id="chipLaptopVal">0 Detected (Clean)</strong>
+                                    </div>
+                                    <div class="chip-status-dot clean" id="chipLaptopDot"></div>
+                                </div>
+                                <div class="tri-meter-chip" id="chipPersonScanner">
+                                    <div class="chip-icon">👥</div>
+                                    <div class="chip-info">
+                                        <span class="chip-title">Room Occupancy & Person Radar</span>
+                                        <strong class="chip-val text-passed" id="chipPersonVal">Single Candidate (Clean)</strong>
+                                    </div>
+                                    <div class="chip-status-dot clean" id="chipPersonDot"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hidden canvas for real-time webcam frame sampling -->
+                        <canvas id="liveScannerCanvas" width="320" height="240" style="display: none;"></canvas>
+
+                        <div class="hud-metrics-list">
+                            <div class="hud-metric-row">
+                                <span>Active Device ID</span>
+                                <strong class="text-passed" id="hudDeviceId">DEV-LINUX-7112</strong>
+                            </div>
+                            <div class="hud-metric-row">
+                                <span>Zero-Tolerance Phones</span>
+                                <strong class="text-passed" id="hudPhoneStatus">0 Detected (Clean)</strong>
+                            </div>
+                            <div class="hud-metric-row">
+                                <span>Secondary Persons</span>
+                                <strong class="text-passed" id="hudPersonsStatus">0 Detected (Clean)</strong>
+                            </div>
+                            <div class="hud-metric-row">
+                                <span>Secondary Laptops</span>
+                                <strong class="text-passed" id="hudLaptopStatus">0 Detected (Clean)</strong>
+                            </div>
+                            <div class="hud-metric-row">
+                                <span>Anti-Cheat Integrity</span>
+                                <strong class="highlight-green" id="hudIntegrityScore">100% SECURE</strong>
+                            </div>
+                        </div>
+
+                        <div class="compliance-reminder-box">
+                            <strong>⚠️ Active Proctoring Rules:</strong>
+                            <ul>
+                                <li>No mobile phones or electronic gadgets allowed in frame.</li>
+                                <li>No double person / secondary persons permitted in room.</li>
+                                <li>No secondary laptops, monitors, or unauthorized aids.</li>
+                                <li>Continuous camera & microphone streams must remain active.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
     </div>
 
-    <script src="app.js"></script>
+    <!-- Candidate Onboarding Wizard Modal Overlay -->
+    <div class="modal-overlay" id="onboardingModal">
+        <div class="wizard-card">
+            <div class="wizard-header">
+                <div>
+                    <h2>Candidate Examination Onboarding</h2>
+                    <p class="wizard-subtitle">Identity Verification, Device Diagnostic & Proctoring Authorization</p>
+                </div>
+                <span class="wizard-step-tag" id="stepTag">Step 1 of 5: Candidate Credentials & Live Photo</span>
+            </div>
+
+            <!-- Wizard Stepper Bar (Clickable Tab Navigation Menu) -->
+            <div class="wizard-progress-bar">
+                <div class="progress-step active" id="progStep1" role="button" tabindex="0" title="Step 1: ID & Live Photo Verification">1. ID & Photo</div>
+                <div class="progress-step" id="progStep2" role="button" tabindex="0" title="Step 2: Candidate Credentials & Login">2. Credentials Login</div>
+                <div class="progress-step" id="progStep3" role="button" tabindex="0" title="Step 3: Examination Violation Rules">3. Exam Rules</div>
+                <div class="progress-step" id="progStep4" role="button" tabindex="0" title="Step 4: Device Hardware Check">4. Device Check</div>
+                <div class="progress-step" id="progStep5" role="button" tabindex="0" title="Step 5: Launch Candidate Studio">5. Launch</div>
+            </div>
+
+            <div class="wizard-body">
+                <!-- Step 1: Candidate Credentials, Document ID Upload & MANDATORY LIVE SELFIE -->
+                <div class="wizard-step-content" id="stepContent1">
+                    <div class="step-title-box">
+                        <h3>1. Candidate Credentials & Live Identity Verification</h3>
+                        <p class="step-desc">Enter candidate details, upload Document ID, and capture a <strong>Mandatory Live Selfie</strong> from your webcam. AI face matcher requires <strong>&ge;70.0% match confidence</strong> to email your single-use password.</p>
+                    </div>
+                    
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="verifyUsername">Candidate Username / Student ID <span class="req-star">*</span>:</label>
+                            <input type="text" id="verifyUsername" placeholder="e.g. STU-001">
+                        </div>
+                        <div class="input-group">
+                            <label for="verifyEmail">Candidate Email Address <span class="req-star">*</span>:</label>
+                            <input type="email" id="verifyEmail" placeholder="candidate@example.com">
+                        </div>
+                    </div>
+
+                    <!-- Document Type Selector (Aadhaar, PAN, Driving License, Passport) -->
+                    <div class="doc-type-selector-wrapper">
+                        <label class="doc-selector-heading">
+                            🪪 Select Identity Document Type <span class="req-star">*</span>:
+                        </label>
+                        <div class="doc-type-pills" id="docTypePills">
+                            <button type="button" class="doc-pill active" data-type="aadhaar">
+                                <span class="pill-icon">🆔</span>
+                                <div class="pill-text">
+                                    <strong>Aadhaar Card</strong>
+                                    <small>Photo on Left</small>
+                                </div>
+                            </button>
+                            <button type="button" class="doc-pill" data-type="pan">
+                                <span class="pill-icon">💳</span>
+                                <div class="pill-text">
+                                    <strong>PAN Card</strong>
+                                    <small>Photo on Left + Sign</small>
+                                </div>
+                            </button>
+                            <button type="button" class="doc-pill" data-type="driving_license">
+                                <span class="pill-icon">🚗</span>
+                                <div class="pill-text">
+                                    <strong>Driving License</strong>
+                                    <small>Smart Card (Right)</small>
+                                </div>
+                            </button>
+                            <button type="button" class="doc-pill" data-type="passport">
+                                <span class="pill-icon">🛂</span>
+                                <div class="pill-text">
+                                    <strong>Passport</strong>
+                                    <small>Bio Page (Right)</small>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Example / Sample Document Reference Guide -->
+                    <div class="doc-example-container" id="docExampleContainer">
+                        <div class="doc-example-header">
+                            <div class="example-header-left">
+                                <span class="example-badge">📋 REFERENCE SAMPLE</span>
+                                <strong class="example-doc-title" id="exampleDocTitle">Sample Indian Aadhaar Card (UIDAI)</strong>
+                            </div>
+                            <button type="button" class="btn-toggle-example" id="toggleExampleBtn">Hide Sample Guide ▲</button>
+                        </div>
+                        <div class="doc-example-body" id="docExampleBody">
+                            <div class="example-mockup-wrapper" id="exampleMockupWrapper">
+                                <!-- Dynamic Document Mockup injected by app.js -->
+                            </div>
+                            <div class="example-guidelines-box">
+                                <div class="guidelines-title">🔍 Verification Checklist & Standards</div>
+                                <div class="guidelines-grid">
+                                    <div class="gl-item valid-item">
+                                        <span class="gl-icon">✅</span>
+                                        <span><strong>Portrait Face:</strong> Must be sharp, unobstructed, and front-facing</span>
+                                    </div>
+                                    <div class="gl-item valid-item">
+                                        <span class="gl-icon">✅</span>
+                                        <span><strong>All 4 Corners:</strong> Keep entire card boundary inside photo</span>
+                                    </div>
+                                    <div class="gl-item invalid-item">
+                                        <span class="gl-icon">❌</span>
+                                        <span><strong>No Glare / Blur:</strong> Avoid direct flashlight reflection on text</span>
+                                    </div>
+                                    <div class="gl-item invalid-item">
+                                        <span class="gl-icon">❌</span>
+                                        <span><strong>No Selfies:</strong> Do not upload camera selfies as the ID card</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Real-Time Document Status & Validation Alert Banner -->
+                    <div class="doc-status-banner" id="docStatusBanner" style="display: none;">
+                        <div class="doc-status-flex">
+                            <div class="doc-status-icon" id="docStatusIcon">🔍</div>
+                            <div class="doc-status-content">
+                                <div class="doc-status-title-row">
+                                    <span class="doc-status-pill" id="docStatusPill">VALIDATING...</span>
+                                    <strong class="doc-status-heading" id="docStatusHeading">Document Analysis</strong>
+                                </div>
+                                <p class="doc-status-msg" id="docStatusMsg">Analyzing card structure and photo extraction...</p>
+                                <div class="doc-status-action-row" id="docStatusActionRow" style="display: none;">
+                                    <button type="button" class="btn btn-warning btn-sm" id="btnSwitchToDetectedDoc">
+                                        ⚡ Switch Selection to <span id="detectedDocNameText">PAN Card</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="photo-capture-grid">
+                        <!-- Left: Document ID Card Upload -->
+                        <div class="photo-card-box">
+                            <div class="photo-card-header">
+                                <label id="docCardHeaderLabel">🆔 Document ID: Aadhaar Card</label>
+                                <span class="sub-label" id="docCardSubLabel">Upload clear photo or scan (front side with face photo)</span>
+                            </div>
+                            <div class="doc-upload-dropzone" id="docUploadDropzone">
+                                <input type="file" id="docIdFileInput" accept="image/*" class="file-input-hidden" hidden>
+                                <div class="photo-preview-container" id="docIdPreview">
+                                    <div class="empty-preview-placeholder">
+                                        <span style="font-size: 1.8rem; display: block; margin-bottom: 6px;">📄</span>
+                                        <strong>Click or Drag to Upload ID</strong>
+                                        <p style="font-size: 0.72rem; color: #64748b; margin-top: 4px;">PNG, JPG up to 10MB (Aadhaar photo will be auto-aligned)</p>
+                                    </div>
+                                <span class="align-badge" id="docAlignBadge">⏳ Awaiting Upload</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Live Selfie: MANDATORY WEBCAM CAPTURE WITH ALIGNMENT OVAL -->
+                        <div class="photo-card-box">
+                            <div class="photo-card-header">
+                                <label>📸 Mandatory Live Selfie (Webcam Capture)</label>
+                                <span class="sub-label">Proof-of-life verification — blink challenge powered by MediaPipe Face Mesh</span>
+                            </div>
+                            <div class="webcam-live-box" style="position:relative;">
+                                <video id="liveSelfieVideo" autoplay playsinline muted></video>
+                                <!-- MediaPipe canvas overlay for face mesh + landmark dots -->
+                                <canvas id="mediapipeCanvas" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></canvas>
+                                <canvas id="liveSelfieCanvas" style="display: none;"></canvas>
+                                <!-- Face Alignment Oval Guide -->
+                                <div class="face-align-guide-overlay" id="faceAlignGuide">
+                                    <div class="face-oval-frame"></div>
+                                    <span class="face-guide-text">Align Face Inside Oval</span>
+                                </div>
+                                <div class="webcam-overlay-status" id="webcamStatusText">Connecting camera...</div>
+                            </div>
+
+                            <!-- Liveness Challenge Panel -->
+                            <div id="livenessChallenge" style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px;margin-top:8px;display:none;">
+                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                                    <span style="font-size:1.3rem;">👁️</span>
+                                    <div>
+                                        <strong style="color:#38bdf8;font-size:0.88rem;">Liveness Anti-Spoofing Challenge</strong>
+                                        <p style="color:#94a3b8;font-size:0.78rem;margin:2px 0 0;">MediaPipe Face Mesh — 468 facial landmarks at 30+ FPS</p>
+                                    </div>
+                                    <span id="livenessBadge" style="margin-left:auto;font-size:0.75rem;padding:3px 8px;border-radius:20px;background:#334155;color:#94a3b8;">⏳ Waiting</span>
+                                </div>
+                                <div id="liveChallengeInstruction" style="font-size:0.82rem;color:#f1f5f9;text-align:center;padding:6px;background:#1e293b;border-radius:6px;">
+                                    👀 Please <strong>blink your eyes</strong> to confirm you are a live person
+                                </div>
+                                <div style="margin-top:8px;background:#1e293b;border-radius:6px;height:6px;overflow:hidden;">
+                                    <div id="livenessProgressBar" style="height:100%;background:#38bdf8;width:0%;transition:width 0.3s;"></div>
+                                </div>
+                                <div style="margin-top:6px;display:flex;gap:8px;font-size:0.75rem;color:#64748b;">
+                                    <span>Blinks detected: <strong id="blinkCount" style="color:#38bdf8;">0</strong></span>
+                                    <span style="margin-left:auto;" id="livenessStatus">Monitoring...</span>
+                                </div>
+                            </div>
+
+                            <div class="webcam-actions photo-card-actions">
+                                <button type="button" class="btn btn-secondary btn-sm" id="startCamBtn">🎥 Enable Camera</button>
+                                <button type="button" class="btn btn-primary btn-sm" id="captureSelfieBtn" disabled>📸 Capture Live Selfie</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Image Alignment Comparison Strip -->
+                    <div class="alignment-comparison-strip" id="alignComparisonStrip" style="display: none;">
+                        <div class="align-thumb-box">
+                            <span class="align-thumb-label">Document Photo</span>
+                            <div class="align-thumb-img-wrap" id="stripDocThumb"></div>
+                        </div>
+                        <div class="align-status-center">
+                            <div class="align-match-icon">⚡</div>
+                            <span class="align-status-title">Auto-Alignment Engine Active</span>
+                            <span class="align-status-desc" id="alignStatusDesc">Both images ready for &ge;70% match verification</span>
+                        </div>
+                        <div class="align-thumb-box">
+                            <span class="align-thumb-label">Live Selfie Photo</span>
+                            <div class="align-thumb-img-wrap" id="stripSelfieThumb"></div>
+                        </div>
+                    </div>
+
+                    <div class="alert-box error-alert" id="verifyErrorAlert" style="display: none;"></div>
+                    <div class="alert-box success-alert" id="verifySuccessAlert" style="display: none;"></div>
+
+                    <div class="wizard-actions" style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-primary" id="verifySubmitBtn" style="flex: 2; min-width: 250px;">⚡ Verify Face Match (>=70%) & Send Password ➔</button>
+                        <button type="button" class="btn btn-secondary" id="step1ToStep2Btn" style="flex: 1; min-width: 180px;">Go to Step 2: Credentials Login ➔</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Authentication & Exam Device Authorization -->
+                <div class="wizard-step-content" id="stepContent2" style="display: none;">
+                    <div class="step-title-box">
+                        <h3>2. Candidate Credentials & Exam Device Authorization</h3>
+                        <p class="step-desc">Enter your credentials to authenticate and authorize this terminal as the registered examination device. Your access password was dispatched to your verified email inbox.</p>
+                    </div>
+
+                    <!-- Exam Device Terminal Binding Card -->
+                    <div class="device-bind-banner">
+                        <div class="dev-bind-icon">🖥️</div>
+                        <div class="dev-bind-info">
+                            <div class="dev-bind-row">
+                                <span class="dev-bind-label">Registered Exam Device ID:</span>
+                                <strong class="dev-bind-id" id="loginDeviceId">DEV-LINUX-7112</strong>
+                                <span class="hw-badge cam-active">DEVICE BOUND ✅</span>
+                            </div>
+                            <p class="dev-bind-sub">Terminal Runtime: Linux x86_64 • Media Streams Bound • Secure Browser Port</p>
+                        </div>
+                    </div>
+
+                    <div class="input-grid" style="margin-top: 15px;">
+                        <div class="input-group">
+                            <label for="authUsername">Candidate ID or Registered Email <span class="req-star">*</span>:</label>
+                            <input type="text" id="authUsername" placeholder="e.g. STU-001 or candidate@email.com">
+                        </div>
+                        <div class="input-group">
+                            <label for="authPassword">Single-Use Exam Password <span class="req-star">*</span>:</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="authPassword" placeholder="Enter password received in your email inbox">
+                                <button type="button" class="btn-toggle-pwd" id="togglePwdBtn" title="Toggle password visibility">👁️</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Candidate Credentials Status & Lookup Helper -->
+                    <div class="credential-lookup-card" style="margin-top: 10px; padding: 12px 14px; background: rgba(30, 41, 59, 0.6); border: 1px dashed #334155; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                            <span style="font-size: 0.78rem; color: #94a3b8;">
+                                📧 <em>Check your email inbox for the single-use exam password.</em>
+                            </span>
+                            <button type="button" class="btn btn-secondary btn-sm" id="checkCredsBtn" style="font-size: 0.72rem; padding: 4px 10px;">
+                                🔍 Check Issued Credentials Status
+                            </button>
+                        </div>
+                        <div id="credsStatusDisplay" style="display: none; margin-top: 8px; font-size: 0.75rem; color: #38bdf8; font-family: monospace; background: #0f172a; padding: 8px; border-radius: 6px;"></div>
+                    </div>
+
+                    <div class="alert-box error-alert" id="authErrorAlert" style="display: none;"></div>
+                    <div class="wizard-actions">
+                        <button class="btn btn-secondary" id="authBackBtn">⬅ Back to Step 1</button>
+                        <button class="btn btn-primary" id="authSubmitBtn">Authorize Device & Log In ➔</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Exam Rules & Violation Code (Inspired by Neon Glow Option Cards Image 1) -->
+                <div class="wizard-step-content" id="stepContent3" style="display: none;">
+                    <div class="step-title-box">
+                        <h3>3. Examination Rules & Violation Codes</h3>
+                        <p class="step-desc">Review the strict proctoring compliance rules in numerical order before entering the exam workspace. Active camera and microphone permissions are required.</p>
+                    </div>
+                    
+                    <div class="neon-rules-container">
+                        <div class="rule-neon-card">
+                            <div class="rule-num-badge">Rule 1</div>
+                            <div class="rule-detail">
+                                <h4>📱 Mobile Phone & Electronic Gadgets Prohibited (Zero Tolerance)</h4>
+                                <p>Operating or viewing any mobile phone, smartphone, or electronic gadget immediately flags a critical violation.</p>
+                            </div>
+                        </div>
+
+                        <div class="rule-neon-card">
+                            <div class="rule-num-badge">Rule 2</div>
+                            <div class="rule-detail">
+                                <h4>👥 Single Candidate Policy (No Double Person / Secondary Persons)</h4>
+                                <p>Only the registered candidate is permitted in frame. Presence of any second person immediately flags a violation.</p>
+                            </div>
+                        </div>
+
+                        <div class="rule-neon-card">
+                            <div class="rule-num-badge">Rule 3</div>
+                            <div class="rule-detail">
+                                <h4>💻 Unauthorized Laptops & Secondary Devices Prohibited</h4>
+                                <p>Using external laptops, secondary screens, notes, or books in the testing workspace is strictly prohibited.</p>
+                            </div>
+                        </div>
+
+                        <div class="rule-neon-card">
+                            <div class="rule-num-badge">Rule 4</div>
+                            <div class="rule-detail">
+                                <h4>👤 Continuous Candidate Presence & Face Centering</h4>
+                                <p>Candidate must remain centered, visible, and focused in the camera stream throughout the examination.</p>
+                            </div>
+                        </div>
+
+                        <div class="rule-neon-card">
+                            <div class="rule-num-badge">Rule 5</div>
+                            <div class="rule-detail">
+                                <h4>🎙️📹 Mandatory Active Camera & Microphone Streams</h4>
+                                <p>Camera and Microphone must remain powered <strong>ON continuously</strong>. Denying or revoking permissions blocks portal access immediately.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="consent-box" style="margin-top: 10px;">
+                        <label class="consent-label">
+                            <input type="checkbox" id="consentCheckbox">
+                            <span>I have read and agree to strictly comply with Violation Rules 1 through 5 above.</span>
+                        </label>
+                    </div>
+                    <div class="alert-box error-alert" id="consentErrorAlert" style="display: none;"></div>
+                    
+                    <div class="wizard-actions">
+                        <button class="btn btn-secondary" id="consentBackBtn">⬅ Back</button>
+                        <button class="btn btn-primary" id="consentSubmitBtn">Accept Rules & Check Device Permissions ➔</button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Device Access Check (Internet, Camera, Microphone) + Re-Verify Connection -->
+                <div class="wizard-step-content" id="stepContent4" style="display: none;">
+                    <div class="step-title-box">
+                        <h3>4. Hardware & Connectivity Diagnostics</h3>
+                        <p class="step-desc">Automatic validation of Internet connection authenticity, webcam video stream, and microphone audio input.</p>
+                    </div>
+
+                    <div class="device-checks-grid">
+                        <div class="device-check-card" id="checkNetCard">
+                            <div class="dev-info">
+                                <span class="dev-icon">🌐</span>
+                                <div>
+                                    <strong>Internet Connection Authenticity</strong>
+                                    <div class="dev-sub" id="netSubText">Testing network connectivity...</div>
+                                </div>
+                            </div>
+                            <span class="badge badge-passed" id="checkNetBadge">CONNECTED ✅</span>
+                        </div>
+
+                        <div class="device-check-card" id="checkCamCard">
+                            <div class="dev-info">
+                                <span class="dev-icon">📹</span>
+                                <div>
+                                    <strong>Webcam Video Stream</strong>
+                                    <div class="dev-sub" id="camSubText">Testing camera authorization...</div>
+                                </div>
+                            </div>
+                            <span class="badge badge-passed" id="checkCamBadge">ACTIVE ✅</span>
+                        </div>
+
+                        <div class="device-check-card" id="checkMicCard">
+                            <div class="dev-info">
+                                <span class="dev-icon">🎙️</span>
+                                <div>
+                                    <strong>Microphone Audio Input</strong>
+                                    <div class="dev-sub" id="micSubText">Testing audio input feed...</div>
+                                </div>
+                            </div>
+                            <span class="badge badge-passed" id="checkMicBadge">ACTIVE ✅</span>
+                        </div>
+                    </div>
+
+                    <div class="alert-box error-alert" id="sysCheckErrorAlert" style="display: none;"></div>
+
+                    <div class="reverify-bar">
+                        <button class="btn btn-secondary" id="reverifyConnBtn">🔄 Re-Verify Connection & Devices</button>
+                        <span class="reverify-note">Re-runs real-time latency ping and hardware stream verification.</span>
+                    </div>
+
+                    <div class="wizard-actions">
+                        <button class="btn btn-secondary" id="sysCheckBackBtn">⬅ Back</button>
+                        <button class="btn btn-primary" id="sysCheckSubmitBtn">Complete Hardware Check ➔</button>
+                    </div>
+                </div>
+
+                <!-- Step 5: Exam Launch (Continuous Cam & Mic) -->
+                <div class="wizard-step-content" id="stepContent5" style="display: none;">
+                    <div class="step-title-box">
+                        <h3>5. Candidate Verification Complete & Session Launch</h3>
+                        <p class="step-desc">All onboarding checks passed. Camera and Microphone streams are active and verified.</p>
+                    </div>
+
+                    <div class="ready-exam-banner">
+                        <div class="exam-ready-icon">🛡️</div>
+                        <div>
+                            <h4 style="color: #34d399; font-size: 1.05rem;">Authorized for Proctored Examination</h4>
+                            <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 4px;">
+                                Candidate: <strong id="readyUsername" style="color: #38bdf8;">STU-001</strong> | Status: Verified (&ge;70% Face Match)
+                            </p>
+                            <div class="hw-status-summary" style="margin-top: 8px;">
+                                <span>📹 Camera: <strong>LIVE ON</strong></span> &bull; 
+                                <span>🎙️ Microphone: <strong>LIVE ON</strong></span> &bull; 
+                                <span>🌐 Network: <strong>STABLE</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wizard-actions" style="margin-top: 16px;">
+                        <button class="btn btn-success wizard-launch-btn" id="launchSessionBtn">🚀 Launch Proctored Exam Portal</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Examination Submission & Certificate Modal -->
+    <div class="modal-overlay" id="examCertificateModal" style="display: none;">
+        <div class="certificate-card">
+            <div class="cert-header">
+                <span class="cert-badge-gold">🏆 PROCTORING INTEGRITY VERIFIED</span>
+                <h2>Official Examination Completion Certificate</h2>
+                <p class="cert-subtitle">National Technical Certification Authority & AI Proctoring System</p>
+            </div>
+
+            <div class="cert-body">
+                <div class="cert-recipient-box">
+                    <span class="cert-for">This certifies that candidate</span>
+                    <h3 class="cert-candidate-name" id="certCandidateName">STU-001 Candidate</h3>
+                    <p class="cert-text">
+                        has completed the <strong>Computer Science & AI Engineering Certification Examination 2026</strong> under continuous, active computer vision proctoring and biometric identity verification.
+                    </p>
+                </div>
+
+                <div class="cert-stats-grid">
+                    <div class="cert-stat-card">
+                        <span class="cert-stat-label">Exam Score</span>
+                        <strong class="cert-stat-val text-passed" id="certScoreVal">5 / 5 (100%)</strong>
+                    </div>
+                    <div class="cert-stat-card">
+                        <span class="cert-stat-label">Face Verification</span>
+                        <strong class="cert-stat-val" id="certFaceVal">93.8% Match</strong>
+                    </div>
+                    <div class="cert-stat-card">
+                        <span class="cert-stat-label">Proctoring Verdict</span>
+                        <strong class="cert-stat-val text-passed" id="certVerdictVal">PASSED (CLEAN)</strong>
+                    </div>
+                    <div class="cert-stat-card">
+                        <span class="cert-stat-label">Certificate Serial ID</span>
+                        <strong class="cert-stat-val" id="certIdVal">CERT-AI-2026-98124</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cert-footer">
+                <button type="button" class="btn btn-secondary" id="certPrintBtn">🖨️ Print / Save Certificate</button>
+                <button type="button" class="btn btn-primary" id="certToExaminerBtn">📊 Go to Examiner Candidate Directory ➔</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Strict Hardware Access Blocked Modal (Camera / Mic Denied) -->
+    <div class="access-blocked-overlay" id="accessBlockedOverlay" style="display: none;">
+        <div class="blocked-card">
+            <div class="blocked-icon-pulse">🛑</div>
+            <h2>Portal Access Blocked</h2>
+            <p class="blocked-reason">
+                Camera or Microphone hardware access has been <strong>denied or disconnected</strong>.
+            </p>
+            <div class="blocked-alert-box">
+                Under strict examination compliance regulations, continuous live video and audio streaming are mandatory. Portal access is strictly halted until both Camera and Microphone permissions are granted.
+            </div>
+            <div class="blocked-checklist">
+                <div class="chk-item" id="blockCamStatus">📹 Camera: <span>Checking...</span></div>
+                <div class="chk-item" id="blockMicStatus">🎙️ Microphone: <span>Checking...</span></div>
+            </div>
+            <div class="blocked-steps">
+                <strong>How to unblock:</strong>
+                <ol>
+                    <li>Click the <strong>Lock 🔒 / Camera 📷</strong> icon in your browser URL bar.</li>
+                    <li>Toggle <strong>Camera</strong> and <strong>Microphone</strong> to <strong>Allow</strong>.</li>
+                    <li>Click the button below to re-verify permissions and resume examination access.</li>
+                </ol>
+            </div>
+            <button type="button" class="btn btn-primary btn-lg" id="unblockRetryBtn">
+                🔄 Re-Verify Permissions & Unblock Portal
+            </button>
+        </div>
+    </div>
+
+    <!-- Full-Screen Violation Evidence Inspector Modal -->
+    <div class="modal-overlay" id="evidenceInspectorModal" style="display: none;">
+        <div class="evidence-inspector-card">
+            <div class="evidence-inspector-header">
+                <div>
+                    <span class="badge badge-failed" id="inspectViolationBadge">📱 MOBILE PHONE DETECTED</span>
+                    <h3 id="inspectModalTitle" style="margin-top: 4px;">Violation Keyframe Evidence</h3>
+                </div>
+                <button type="button" class="close-drawer-btn" id="closeEvidenceModalBtn">✖ Close</button>
+            </div>
+            <div class="evidence-inspector-body">
+                <div class="evidence-img-container">
+                    <img id="inspectKeyframeImg" src="" alt="Violation Evidence Keyframe">
+                </div>
+                <div class="evidence-meta-panel">
+                    <h4>Evidence Metadata Breakdown</h4>
+                    <div class="evidence-meta-row">
+                        <span>Timestamp in Clip:</span>
+                        <strong id="inspectTimestamp">00:00:03.200</strong>
+                    </div>
+                    <div class="evidence-meta-row">
+                        <span>Peak Confidence Score:</span>
+                        <strong id="inspectConfidence">94.5%</strong>
+                    </div>
+                    <div class="evidence-meta-row">
+                        <span>Violated Objects:</span>
+                        <strong id="inspectObjects">cell phone</strong>
+                    </div>
+                    <div class="evidence-meta-row">
+                        <span>Rule Triggered:</span>
+                        <p id="inspectRuleText" style="color: #cbd5e1; font-size: 0.8rem; margin: 4px 0 0;"></p>
+                    </div>
+                    <div class="evidence-meta-row">
+                        <span>Disk Evidence Path:</span>
+                        <code id="inspectDiskPath" style="font-size: 0.72rem; word-break: break-all; color: #94a3b8;"></code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MediaPipe Face Mesh — runs in browser via WebGL without conflicting with native webcam -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+    <script src="app.js?v=2.2"></script>
 </body>
 </html>

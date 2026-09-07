@@ -1,30 +1,14 @@
 ## 13. API Design & System Reset
-### 1. System Reset API
+### 1. Pre-Auth Identity Verification API
 - **HTTP Method**: `POST`
-- **Path**: `/api/v1/system/reset`
-- **Response Body (HTTP 200 OK)**:
-```json
-{
-  "status": "SUCCESS",
-  "message": "All database records and evidence files have been purged. Serial counter reset to STU-001.",
-  "next_student_id": "STU-001"
-}
-```
+- **Path**: `/api/v1/onboarding/verify-id`
+- **Request Body**: `{"username": "STU-001", "email": "candidate@example.com", "document_id_b64": "...", "live_selfie_b64": "..."}`
+- **Response**: `{"status": "VERIFIED", "match_confidence": 0.945, "match_percentage": "94.5%", "email_sent_to": "candidate@example.com"}`
 
-### 2. Get Next Serial Student ID API
-- **HTTP Method**: `GET`
-- **Path**: `/api/v1/system/next-student-id`
-- **Response Body (HTTP 200 OK)**:
-```json
-{
-  "next_student_id": "STU-001"
-}
-```
-
-### 3. Process Video Upload API
+### 2. Candidate Login API
 - **HTTP Method**: `POST`
-- **Path**: `/api/v1/videos/process`
-- **Request Form Data**: `file: UploadFile`, `student_id: Optional[str]`, `student_name: Optional[str]`, `exam_id: Optional[str]`
-- **Response Body**: Full JSON analysis report.
+- **Path**: `/api/v1/auth/login`
+- **Request Body**: `{"username": "STU-001", "password": "849201"}`
+- **Response**: `{"access_token": "tok-STU-001-a1b2c3d4", "status": "AUTHENTICATED"}`
 
 ---

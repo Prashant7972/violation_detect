@@ -15,11 +15,6 @@ pip install -r requirements.txt
 python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### 2. Reset All Data via API
-```bash
-curl -X POST http://localhost:8000/api/v1/system/reset
-```
-
 ---
 
 ---
@@ -40,20 +35,25 @@ Automated disk purging and log rotation.
 
 ## 36. Final End-to-End Workflow
 ```
-[ADMIN / USER]
-  │  Leaves Student ID blank or provides custom ID
+[PRE-AUTH VERIFICATION]
+  │  Candidate enters Username & Email
+  │  Uploads Document ID Photo + Live Selfie Photo
+  │  AI Face Matcher evaluates facial similarity
+  │  IF Match Confidence >= 90.0%:
+  │      - Auto-generates 6-digit Password (e.g. 849201)
+  │      - Sends Email Notification to candidate's email address
   ▼
-[SERIAL ID GENERATOR]
-  │  Assigns next serial ID: STU-001  ──►  STU-002  ──►  STU-003
+[AUTHENTICATION & ONBOARDING WIZARD]
+  │  Step 1: Log in with Username & Received Password
+  │  Step 2: Accept Privacy Consent Agreement
+  │  Step 3: Automated Browser System Check
+  │  Step 4: Unlock Evaluation Session Dashboard
   ▼
-[VIDEO SAMPLER & AI DETECTOR]
-  │  Sample frames at 1 FPS  ──►  YOLOv8 Inference  ──►  Rule Evaluation
+[VIDEO FILE EVALUATION]
+  │  AI Object Inference & Violation Interval Tracking
+  │  Zero Tolerance Enforcement (Phone > 0s = FAILED)
   ▼
-[TIME TRACKER & LIMIT ENGINE]
-  │  Calculate violation durations  ──►  Flag PASSED or FAILED
-  ▼
-[EXAMINER DIRECTORY & SYSTEM RESET]
-  │  View candidate reports or click "Reset All Data" to clear storage
-  ▼
-[CLEAN STATE]
+[EXAMINER DIRECTORY & REPORT INSPECTOR]
 ```
+
+---

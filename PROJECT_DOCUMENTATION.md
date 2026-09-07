@@ -39,6 +39,9 @@
 34. [Monitoring](#34-monitoring)
 35. [Maintenance](#35-maintenance)
 36. [Final End-to-End Workflow](#36-final-end-to-end-workflow)
+37. [Candidate Onboarding & Readiness Flow](#37-candidate-onboarding--readiness-flow)
+38. [Passcode Generation & Ownership Architecture](#38-passcode-generation--ownership-architecture)
+39. [Pre-Auth Identity Verification & Email Password Dispatch Flow](#39-pre-auth-identity-verification--email-password-dispatch-flow)
 
 ---
 
@@ -84,15 +87,15 @@ Manual supervision of video recordings (e.g., remote exam recordings, workplace 
 ```
 USER / ADMIN
   │
-  ├─► Provides Video Clip Input (e.g. candidate_video.mp4)
+  ├─► Pre-Auth Verification: Upload Document ID + Live Selfie Photo
   │
-  ├─► Leaves Student ID blank or provides custom Student ID (e.g. STU-001)
+  ├─► System AI Face Matcher enforces >= 90.0% Confidence -> Generates Password -> Sends Email Notification
   │
-  ├─► Submits video file via CLI `python process_video.py` or Web UI Dashboard
+  ├─► Candidate logs in using Username & Received Password
   │
-  ├─► System processes video clip & calculates violation time intervals
+  ├─► Completes Privacy Consent & Media Readiness Checks
   │
-  ├─► System stores evidence in candidate-isolated directory `/evidence/candidates/STU-001/`
+  ├─► Submits Video Clip for Evaluation & Violations Inspection
   │
   └─► Admin can view Candidate Directory or click "Reset All Data" to start clean
 ```
@@ -156,6 +159,9 @@ USER / ADMIN
 ---
 
 ## 9. Component Responsibilities
+- **Face Verification Engine (`FaceVerifier`)**: Compares Document ID Photo against Live Selfie Photo and enforces $\ge 90.0\%$ facial match confidence.
+- **Candidate Onboarding Manager**: Handles pre-auth verification (`/onboarding/verify-id`), login (`/auth/login`), consent (`/onboarding/consent`), and readiness checks (`/onboarding/readiness-check`).
+- **Passcode Management Engine**: Configures and manages active exam passcodes (`/system/passcode`).
 - **Serial Student ID Generator**: Scans existing submissions and assigns next sequential zero-padded ID (`STU-001`, `STU-002`, ...).
 - **System Reset Service**: Handles `POST /api/v1/system/reset`, truncating all DB tables and removing file artifacts from disk.
 - **Video Sampler**: Steps through video frames at configured sample rates (`1.0 FPS`).
@@ -185,18 +191,21 @@ ai_detection_system/
 │   ├── main.py
 │   ├── config.py
 │   ├── api/
-│   │   ├── endpoints.py          # API Routers (Includes Reset & Student ID routes)
+│   │   ├── endpoints.py          # API Routers (Includes Auth, Passcode, Reset & Student ID routes)
 │   │   └── schemas.py
 │   ├── db/
 │   │   ├── session.py
 │   │   └── models.py             # ORM Models (CandidateSubmissionModel)
 │   └── ai/
 │       ├── detector.py
+│       ├── face_verifier.py      # Face Verification Engine (>=75% confidence)
 │       ├── rule_engine.py
 │       └── video_processor.py   # Serial ID & Duration Processor
 ├── evidence/
 │   └── candidates/               # Candidate-isolated storage
 ├── tests/
+│   ├── test_auth_and_onboarding.py
+│   ├── test_face_verification.py
 │   ├── test_candidate_submissions.py
 │   ├── test_system_reset_and_serial.py
 │   └── test_video_processor.py
@@ -228,33 +237,17 @@ ai_detection_system/
 
 ## 13. API Design & System Reset
 
-### 1. System Reset API
+### 1. Pre-Auth Identity Verification API
 - **HTTP Method**: `POST`
-- **Path**: `/api/v1/system/reset`
-- **Response Body (HTTP 200 OK)**:
-```json
-{
-  "status": "SUCCESS",
-  "message": "All database records and evidence files have been purged. Serial counter reset to STU-001.",
-  "next_student_id": "STU-001"
-}
-```
+- **Path**: `/api/v1/onboarding/verify-id`
+- **Request Body**: `{"username": "STU-001", "email": "candidate@example.com", "document_id_b64": "...", "live_selfie_b64": "..."}`
+- **Response**: `{"status": "VERIFIED", "match_confidence": 0.945, "match_percentage": "94.5%", "email_sent_to": "candidate@example.com"}`
 
-### 2. Get Next Serial Student ID API
-- **HTTP Method**: `GET`
-- **Path**: `/api/v1/system/next-student-id`
-- **Response Body (HTTP 200 OK)**:
-```json
-{
-  "next_student_id": "STU-001"
-}
-```
-
-### 3. Process Video Upload API
+### 2. Candidate Login API
 - **HTTP Method**: `POST`
-- **Path**: `/api/v1/videos/process`
-- **Request Form Data**: `file: UploadFile`, `student_id: Optional[str]`, `student_name: Optional[str]`, `exam_id: Optional[str]`
-- **Response Body**: Full JSON analysis report.
+- **Path**: `/api/v1/auth/login`
+- **Request Body**: `{"username": "STU-001", "password": "849201"}`
+- **Response**: `{"access_token": "tok-STU-001-a1b2c3d4", "status": "AUTHENTICATED"}`
 
 ---
 
@@ -290,9 +283,9 @@ YOLOv8 nano / PyTorch model (`conf=0.25`) with NMS deduplication.
 
 | Rule ID | Event Code | Condition | Default Limit |
 |---|---|---|---|
-| `R-01` | `PHONE_DETECTED` | `IF object IN ['cell phone'] AND confidence >= 0.30` | **5.0 Seconds** |
-| `R-02` | `MULTIPLE_PERSONS` | `IF count(person) > 1 AND confidence >= 0.55` | **3.0 Seconds** |
-| `R-03` | `NO_PERSON_DETECTED` | `IF count(person) == 0 AND confidence >= 0.55` | **10.0 Seconds** |
+| `R-01` | `PHONE_DETECTED` | `IF object IN ['cell phone'] AND confidence >= 0.30` | **0.0 Seconds (Zero Tolerance)** |
+| `R-02` | `MULTIPLE_PERSONS` | `IF count(person) > 1 AND confidence >= 0.55` | **0.0 Seconds (Zero Tolerance)** |
+| `R-03` | `NO_PERSON_DETECTED` | `IF count(person) == 0 AND confidence >= 0.55` | **5.0 Seconds** |
 
 ---
 
@@ -302,7 +295,7 @@ Saves annotated JPEG snapshot with red/orange bounding boxes: `/evidence/candida
 ---
 
 ## 20. Session Lifecycle
-Status transitions: `RECEIVED` $\rightarrow$ `PROCESSING` $\rightarrow$ `PASSED` / `FAILED`.
+Status transitions: `UNVERIFIED` $\rightarrow$ `VERIFIED` $\rightarrow$ `AUTHENTICATED` $\rightarrow$ `CONSENT_RECORDED` $\rightarrow$ `READY_FOR_SESSION` $\rightarrow$ `EVALUATED` (`PASSED` / `FAILED`).
 
 ---
 
@@ -312,7 +305,7 @@ Invalid format returns HTTP 400; database rollback on transaction error.
 ---
 
 ## 22. Logging
-Structured JSON logging for file processing and reset operations.
+Structured JSON logging for authentication, onboarding, processing, and reset operations.
 
 ---
 
@@ -327,24 +320,24 @@ Sampled 1 FPS frame extraction processes 5-minute video in `<10 seconds`.
 ---
 
 ## 25. Testing Strategy
-- Unit tests for serial Student ID generation (`STU-001`, `STU-002`).
+- Unit tests for face matching confidence ($\ge 90\%$), authentication, passcode configuration, privacy consent, and readiness checks.
 - Integration tests for System Reset API (`POST /api/v1/system/reset`).
 
 ---
 
 ## 26. Implementation Phases
-- **Phase 1**: Serial Student ID generator (`get_next_serial_student_id`).
-- **Phase 2**: System Reset API endpoint (`POST /api/v1/system/reset`).
-- **Phase 3**: Web UI Auto-Populated Serial ID & Reset button.
-- **Phase 4**: Automated Pytest test suite execution.
+- **Phase 1**: Pre-Auth ID & Live Selfie Verification (`/onboarding/verify-id`) with $\ge 90\%$ confidence enforcement.
+- **Phase 2**: Email Password Generation & Dispatch.
+- **Phase 3**: Username & Password Authentication (`/auth/login`).
+- **Phase 4**: Web UI 5-Step Onboarding Wizard.
 
 ---
 
 ## 27. Development Checklist
-- [x] Create project structure and master documentation
-- [x] Implement Serial Student ID generator
-- [x] Implement System Reset API endpoint
-- [x] Add Web UI Auto-Populated ID & Reset button
+- [x] Implement Pre-Auth ID & Selfie Face Matcher (>=75% Confidence)
+- [x] Implement Email Password Generation & Dispatch
+- [x] Update Username & Password Authentication APIs
+- [x] Add Web UI 5-Step Onboarding Wizard
 - [x] Run Pytest automated test suite
 
 ---
@@ -363,11 +356,6 @@ pip install -r requirements.txt
 ### 1. Launch Web Application
 ```bash
 python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-```
-
-### 2. Reset All Data via API
-```bash
-curl -X POST http://localhost:8000/api/v1/system/reset
 ```
 
 ---
@@ -405,20 +393,99 @@ Automated disk purging and log rotation.
 ## 36. Final End-to-End Workflow
 
 ```
-[ADMIN / USER]
-  │  Leaves Student ID blank or provides custom ID
+[PRE-AUTH VERIFICATION]
+  │  Candidate enters Username & Email
+  │  Uploads Document ID Photo + Live Selfie Photo
+  │  AI Face Matcher evaluates facial similarity
+  │  IF Match Confidence >= 75.0%:
+  │      - Auto-generates 6-digit Password (e.g. 849201)
+  │      - Sends Email Notification to candidate's email address
   ▼
-[SERIAL ID GENERATOR]
-  │  Assigns next serial ID: STU-001  ──►  STU-002  ──►  STU-003
+[AUTHENTICATION & ONBOARDING WIZARD]
+  │  Step 1: Log in with Username & Received Password
+  │  Step 2: Accept Privacy Consent Agreement
+  │  Step 3: Automated Browser System Check
+  │  Step 4: Unlock Evaluation Session Dashboard
   ▼
-[VIDEO SAMPLER & AI DETECTOR]
-  │  Sample frames at 1 FPS  ──►  YOLOv8 Inference  ──►  Rule Evaluation
+[VIDEO FILE EVALUATION]
+  │  AI Object Inference & Violation Interval Tracking
+  │  Zero Tolerance Enforcement (Phone > 0s = FAILED)
   ▼
-[TIME TRACKER & LIMIT ENGINE]
-  │  Calculate violation durations  ──►  Flag PASSED or FAILED
-  ▼
-[EXAMINER DIRECTORY & SYSTEM RESET]
-  │  View candidate reports or click "Reset All Data" to clear storage
-  ▼
-[CLEAN STATE]
+[EXAMINER DIRECTORY & REPORT INSPECTOR]
 ```
+
+---
+
+## 37. Candidate Onboarding & Readiness Flow
+
+### A. Stage-by-Stage Onboarding Flow
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│ 1. ID Photo &   │────►│ 2. Login with   │────►│ 3. Privacy      │────►│ 4. Media & Sys  │────►│ 5. Session      │
+│ Selfie Match    │     │ Username/Pass   │     │ Consent Check   │     │ Permissions     │     │ Launch & Video  │
+└─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+1. **Stage 1: Pre-Auth ID & Live Selfie Verification**:
+   - Candidate enters Username and Email Address.
+   - Candidate uploads Document ID Photo and takes a Live Selfie capture.
+   - `FaceVerifier` calculates match confidence. If $\ge 75\%$, system generates password and sends email notification.
+2. **Stage 2: Candidate Login**:
+   - Candidate enters `Username` and `Password` received in their email.
+3. **Stage 3: Consent & Privacy Agreement**:
+   - Candidate accepts privacy terms.
+4. **Stage 4: Media Permissions & System Environment Checks**:
+   - Browser capability validation.
+5. **Stage 5: Session Launch**:
+   - System unlocks Candidate Video Processing Dashboard.
+
+---
+
+## 38. Passcode Generation & Ownership Architecture
+Detail on Admin configured passcodes vs auto-generated candidate OTP passwords.
+
+---
+
+## 39. Pre-Auth Identity Verification & Email Password Dispatch Flow
+
+### Facial Matching Confidence Enforcement ($\ge 70.0\%$)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Candidate Document ID Photo vs Live Selfie Photo Comparison │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+                               ▼
+                    Match Confidence Score (S)
+                               │
+            ┌──────────────────┴──────────────────┐
+            │                                     │
+    S >= 0.70 (70%)                       S < 0.70 (70%)
+            │                                     │
+            ▼                                     ▼
+[MATCH SUCCESS (VERIFIED)]             [MATCH FAILED (REJECTED)]
+- Auto-generate Single-Use Password    - HTTP 400 Bad Request
+- Dispatch Email Notification          - Error: "Match confidence (68.2%)
+- Unlock Login Step                      is below required 70% threshold."
+```
+
+---
+
+## 40. Full 5-Step Proctoring Workflow & Technology Matrix
+
+### Technology Matrix
+- **Backend**: FastAPI, Uvicorn, Pydantic v2 (`@model_validator`), SQLAlchemy, SQLite, Starlette.
+- **Biometrics & AI**: InsightFace ArcFace `buffalo_l` (`det_10g.onnx`, `w600k_r50.onnx`, `1k3d68`, `2d106det`, `genderage`), ONNX Runtime (`CPUExecutionProvider`).
+- **Computer Vision**: OpenCV (`cv2`) for CLAHE equalization, Laplacian blur variance, Sobel MRZ energy, HSV color segmentation, and Haar multi-cascades.
+- **Client Liveness**: MediaPipe Face Mesh (468 landmarks, Eye Aspect Ratio blink challenge via WebGL).
+- **Object Violations**: YOLOv8 / OpenCV multi-cascades with Non-Maximum Suppression (NMS).
+- **Client**: Vanilla JS (ES6+), WebRTC MediaDevices API, Web Audio API (`AudioContext`, `AnalyserNode`), dynamic SVG document mockups.
+
+### 5-Step Workflow Summary
+1. **Step 1: Identity & Live Selfie**: Select document type (Aadhaar, PAN, DL, Passport), real-time document validation & mismatch warning, MediaPipe EAR blink liveness, and ArcFace $\ge 70\%$ match. Password dispatched strictly to candidate email.
+2. **Step 2: Candidate Login**: Log in with Candidate ID and password from email; binds exam device terminal (`DEV-LINUX-7112`).
+3. **Step 3: Numerical Rules & Hardware Enforcement**: Review strict anti-cheat rules (phone prohibited, single person, no laptops). Continuous camera & microphone monitoring locks portal behind security overlay if permissions are revoked.
+4. **Step 4: Hardware Diagnostics**: Pre-flight checks for camera FPS, audio decibel levels, network latency, and display bounds.
+5. **Step 5: Exam Launch & Multi-Video Evaluation Studio**: Ingests exam recordings, samples frames, detects violations, extracts keyframes with bounding boxes under `/evidence/...`, and provides interactive Evidence Inspector.
+

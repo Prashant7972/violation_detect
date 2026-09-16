@@ -59,6 +59,7 @@ class CandidateSubmissionModel(Base):
     limit_exceeded = Column(Integer, nullable=False, default=0) # 0 = False, 1 = True
     
     phone_duration_seconds = Column(Float, nullable=False, default=0.0)
+    device_duration_seconds = Column(Float, nullable=False, default=0.0)
     missing_duration_seconds = Column(Float, nullable=False, default=0.0)
     multiple_persons_duration_seconds = Column(Float, nullable=False, default=0.0)
     

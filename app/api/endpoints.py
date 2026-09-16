@@ -24,6 +24,7 @@ from app.ai.video_processor import VideoProcessor
 from app.ai.face_verifier import FaceVerifier
 from app.ai.document_validator import DocumentValidator
 from app.utils.email_service import EmailService
+from app.ai.policy_chatbot import policy_chatbot
 
 logger = logging.getLogger("app.api.endpoints")
 router = APIRouter()
@@ -392,6 +393,7 @@ def submit_candidate_exam(payload: schemas.ExamSubmissionRequest, db: Session = 
         overall_status=overall_status,
         limit_exceeded=0 if passed_integrity else 1,
         phone_duration_seconds=phone_s,
+        device_duration_seconds=0.0,
         missing_duration_seconds=0.0,
         multiple_persons_duration_seconds=multi_s,
         report_json_path=report_file_path,
@@ -652,17 +654,27 @@ def scan_live_webcam_frame(payload: schemas.ScanLiveFrameRequest):
     person_present = any(d.get("object") == "person" for d in detections)
     violations = []
 
+    from app.ai.policy_chatbot import policy_chatbot
     for rule in triggered_rules:
         ev_type = rule["event_type"]
         if ev_type == "PHONE_DETECTED":
             phone_detected = True
-            violations.append("MOBILE_PHONE_DETECTED")
+            if policy_chatbot.is_violation_prohibited("PHONE"):
+                violations.append("MOBILE_PHONE_DETECTED")
+            else:
+                logger.info("Mobile phone detected but permitted under active client policy.")
         elif ev_type == "UNAUTHORIZED_DEVICE":
             laptop_detected = True
-            violations.append("SECONDARY_LAPTOP_DETECTED")
+            if policy_chatbot.is_violation_prohibited("LAPTOP"):
+                violations.append("SECONDARY_LAPTOP_DETECTED")
+            else:
+                logger.info("Secondary laptop detected but permitted under active client policy.")
         elif ev_type == "MULTIPLE_PERSONS":
             multiple_persons = True
-            violations.append("MULTIPLE_PERSONS_IN_FRAME")
+            if policy_chatbot.is_violation_prohibited("PERSON"):
+                violations.append("MULTIPLE_PERSONS_IN_FRAME")
+            else:
+                logger.info("Multiple persons detected but permitted under active client policy.")
 
     evidence_url = None
     if violations:
@@ -799,6 +811,28 @@ def get_admin_policy_breaches(student_id: Optional[str] = None, company_id: Opti
     )
 
 
+@router.post("/policies/ingest-document", response_model=schemas.PolicyDocumentIngestResponse)
+def ingest_client_policy_document(payload: schemas.PolicyDocumentIngestRequest):
+    """
+    Ingests an administrative client company policy document (file or text).
+    Dynamically extracts and defines violation breach policies (phones, laptops, solitude).
+    Registers the company into the multi-company policy registry and activates it.
+    """
+    from app.ai.policy_chatbot import policy_chatbot
+    result = policy_chatbot.ingest_policy_document(
+        company_name=payload.company_name,
+        industry=payload.industry or "Technology",
+        strictness=payload.strictness or "HIGH",
+        document_text=payload.document_text or "",
+        document_filename=payload.document_filename,
+        file_b64=payload.file_b64,
+        phone_allowed=payload.phone_allowed,
+        laptop_allowed=payload.laptop_allowed,
+        person_allowed=payload.person_allowed
+    )
+    return schemas.PolicyDocumentIngestResponse(**result)
+
+
 @router.post("/videos/process")
 def process_video_clip(
     file: UploadFile = File(...),
@@ -885,6 +919,53 @@ def batch_process_video_clips(
         submissions=processed_submissions
     )
 
+def _evaluate_candidate_compliance(sub: CandidateSubmissionModel):
+    phone_prohibited = policy_chatbot.is_violation_prohibited("PHONE_DETECTED")
+    laptop_prohibited = policy_chatbot.is_violation_prohibited("UNAUTHORIZED_DEVICE")
+    person_prohibited = policy_chatbot.is_violation_prohibited("MULTIPLE_PERSONS")
+
+    device_dur = getattr(sub, "device_duration_seconds", 0.0) or 0.0
+    if device_dur == 0.0 and sub.report_json_path and os.path.exists(sub.report_json_path):
+        try:
+            with open(sub.report_json_path, "r") as f:
+                rj = json.load(f)
+                device_dur = rj.get("cumulative_durations", {}).get("UNAUTHORIZED_DEVICE", 0.0)
+        except Exception:
+            pass
+
+    # Check for stored evidence keyframes on disk
+    target_dir = sub.evidence_dir_path or os.path.join(settings.EVIDENCE_DIR, "candidates", sub.student_id)
+    has_prohibited_evidence = False
+    if os.path.exists(target_dir):
+        for root, _, files in os.walk(target_dir):
+            for fn in files:
+                fn_low = fn.lower()
+                if fn_low.endswith((".jpg", ".jpeg", ".png")) and ("evidence" in fn_low or "violation" in fn_low):
+                    if laptop_prohibited and ("laptop" in fn_low or "device" in fn_low):
+                        has_prohibited_evidence = True
+                        if device_dur == 0.0:
+                            device_dur = 1.0
+                        break
+                    if phone_prohibited and "phone" in fn_low:
+                        has_prohibited_evidence = True
+                        break
+                    if person_prohibited and ("multiple" in fn_low or "person" in fn_low):
+                        has_prohibited_evidence = True
+                        break
+            if has_prohibited_evidence:
+                break
+
+    has_prohibited = (
+        (phone_prohibited and (sub.phone_duration_seconds or 0.0) > 0) or
+        (laptop_prohibited and device_dur > 0) or
+        (person_prohibited and (sub.multiple_persons_duration_seconds or 0.0) > 0) or
+        ((sub.missing_duration_seconds or 0.0) > 5.0) or
+        has_prohibited_evidence
+    )
+    effective_status = "FAILED" if has_prohibited else "PASSED"
+    return effective_status, has_prohibited, device_dur
+
+
 @router.get("/candidates", response_model=schemas.CandidateListResponse)
 def list_candidate_submissions(
     student_id: Optional[str] = Query(None, description="Filter by Student ID"),
@@ -897,13 +978,43 @@ def list_candidate_submissions(
         query = query.filter(CandidateSubmissionModel.student_id.ilike(f"%{student_id}%"))
     if exam_id:
         query = query.filter(CandidateSubmissionModel.exam_id.ilike(f"%{exam_id}%"))
-    if status:
-        query = query.filter(CandidateSubmissionModel.overall_status == status.upper())
 
     submissions = query.order_by(CandidateSubmissionModel.created_at.desc()).all()
+
+    phone_prohibited = policy_chatbot.is_violation_prohibited("PHONE_DETECTED")
+    laptop_prohibited = policy_chatbot.is_violation_prohibited("UNAUTHORIZED_DEVICE")
+    person_prohibited = policy_chatbot.is_violation_prohibited("MULTIPLE_PERSONS")
+
+    processed = []
+    for sub in submissions:
+        effective_status, has_prohibited, device_dur = _evaluate_candidate_compliance(sub)
+
+        if status and effective_status != status.upper():
+            continue
+
+        item_dict = {
+            "id": sub.id,
+            "submission_id": sub.submission_id,
+            "student_id": sub.student_id,
+            "student_name": sub.student_name,
+            "exam_id": sub.exam_id,
+            "video_filename": sub.video_filename,
+            "video_duration_seconds": sub.video_duration_seconds,
+            "overall_status": effective_status,
+            "limit_exceeded": 1 if has_prohibited else 0,
+            "phone_duration_seconds": sub.phone_duration_seconds if phone_prohibited else 0.0,
+            "device_duration_seconds": device_dur if laptop_prohibited else 0.0,
+            "missing_duration_seconds": sub.missing_duration_seconds,
+            "multiple_persons_duration_seconds": sub.multiple_persons_duration_seconds if person_prohibited else 0.0,
+            "report_json_path": sub.report_json_path,
+            "evidence_dir_path": sub.evidence_dir_path,
+            "created_at": sub.created_at
+        }
+        processed.append(schemas.CandidateSubmissionResponse(**item_dict))
+
     return schemas.CandidateListResponse(
-        total_submissions=len(submissions),
-        submissions=submissions
+        total_submissions=len(processed),
+        submissions=processed
     )
 
 @router.get("/candidates/{student_id}", response_model=schemas.CandidateListResponse)
@@ -915,9 +1026,37 @@ def get_student_submissions(student_id: str, db: Session = Depends(get_db)):
     if not submissions:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No submissions found for Student ID '{student_id}'")
 
+    phone_prohibited = policy_chatbot.is_violation_prohibited("PHONE_DETECTED")
+    laptop_prohibited = policy_chatbot.is_violation_prohibited("UNAUTHORIZED_DEVICE")
+    person_prohibited = policy_chatbot.is_violation_prohibited("MULTIPLE_PERSONS")
+
+    processed = []
+    for sub in submissions:
+        effective_status, has_prohibited, device_dur = _evaluate_candidate_compliance(sub)
+
+        item_dict = {
+            "id": sub.id,
+            "submission_id": sub.submission_id,
+            "student_id": sub.student_id,
+            "student_name": sub.student_name,
+            "exam_id": sub.exam_id,
+            "video_filename": sub.video_filename,
+            "video_duration_seconds": sub.video_duration_seconds,
+            "overall_status": effective_status,
+            "limit_exceeded": 1 if has_prohibited else 0,
+            "phone_duration_seconds": sub.phone_duration_seconds if phone_prohibited else 0.0,
+            "device_duration_seconds": device_dur if laptop_prohibited else 0.0,
+            "missing_duration_seconds": sub.missing_duration_seconds,
+            "multiple_persons_duration_seconds": sub.multiple_persons_duration_seconds if person_prohibited else 0.0,
+            "report_json_path": sub.report_json_path,
+            "evidence_dir_path": sub.evidence_dir_path,
+            "created_at": sub.created_at
+        }
+        processed.append(schemas.CandidateSubmissionResponse(**item_dict))
+
     return schemas.CandidateListResponse(
-        total_submissions=len(submissions),
-        submissions=submissions
+        total_submissions=len(processed),
+        submissions=processed
     )
 
 @router.get("/submissions/{submission_id}")
@@ -934,18 +1073,15 @@ def get_submission_report(submission_id: str, db: Session = Depends(get_db)):
             except Exception:
                 report_data = {}
 
-    report_data["submission_id"] = sub.submission_id
-    report_data["student_id"] = sub.student_id
-    report_data["student_name"] = sub.student_name
-    report_data["video_filename"] = sub.video_filename
-    report_data["overall_status"] = sub.overall_status
-    report_data["phone_duration_seconds"] = sub.phone_duration_seconds
-    report_data["missing_duration_seconds"] = sub.missing_duration_seconds
-    report_data["multiple_persons_duration_seconds"] = getattr(sub, "multiple_persons_duration_seconds", 0.0)
+    phone_prohibited = policy_chatbot.is_violation_prohibited("PHONE_DETECTED")
+    laptop_prohibited = policy_chatbot.is_violation_prohibited("UNAUTHORIZED_DEVICE")
+    person_prohibited = policy_chatbot.is_violation_prohibited("MULTIPLE_PERSONS")
+
+    effective_status, has_prohibited, device_dur = _evaluate_candidate_compliance(sub)
 
     # Gather evidence frames if missing from json
-    if "evidence_frames" not in report_data or not report_data["evidence_frames"]:
-        evidence_frames = []
+    raw_evidence = report_data.get("evidence_frames") or []
+    if not raw_evidence:
         target_dir = sub.evidence_dir_path or os.path.join(settings.EVIDENCE_DIR, "candidates", sub.student_id)
         if os.path.exists(target_dir):
             abs_evidence_dir = os.path.abspath(settings.EVIDENCE_DIR)
@@ -964,7 +1100,7 @@ def get_submission_report(submission_id: str, db: Session = Depends(get_db)):
                         elif "no_person" in f.lower():
                             ev_type = "NO_PERSON_DETECTED"
 
-                        evidence_frames.append({
+                        raw_evidence.append({
                             "student_id": sub.student_id,
                             "event_type": ev_type,
                             "evidence_url": f"/evidence/{rel_p.replace(os.sep, '/')}",
@@ -972,14 +1108,38 @@ def get_submission_report(submission_id: str, db: Session = Depends(get_db)):
                             "timestamp": "00:00:00",
                             "peak_confidence": 0.90
                         })
-        report_data["evidence_frames"] = evidence_frames
+
+    # Filter out evidence frames for events permitted under the active policy
+    filtered_evidence = [
+        ef for ef in raw_evidence
+        if policy_chatbot.is_violation_prohibited(ef.get("event_type", "VIOLATION"))
+    ]
+    report_data["evidence_frames"] = filtered_evidence
+
+    if len(filtered_evidence) > 0:
+        has_prohibited = True
+        effective_status = "FAILED"
+
+    report_data["submission_id"] = sub.submission_id
+    report_data["student_id"] = sub.student_id
+    report_data["student_name"] = sub.student_name
+    report_data["video_filename"] = sub.video_filename
+    report_data["overall_status"] = effective_status
+    report_data["phone_duration_seconds"] = sub.phone_duration_seconds if phone_prohibited else 0.0
+    report_data["device_duration_seconds"] = device_dur if laptop_prohibited else 0.0
+    report_data["phone_allowed"] = not phone_prohibited
+    report_data["laptop_allowed"] = not laptop_prohibited
+    report_data["person_allowed"] = not person_prohibited
+    report_data["missing_duration_seconds"] = sub.missing_duration_seconds
+    report_data["multiple_persons_duration_seconds"] = getattr(sub, "multiple_persons_duration_seconds", 0.0)
 
     return report_data
 
 @router.get("/candidates/{student_id}/evidence")
 def get_candidate_evidence(student_id: str):
     """
-    Returns all stored violation keyframe evidence files for a given student ID.
+    Returns all stored violation keyframe evidence files for a given student ID,
+    filtered by active company RAG policy permissions.
     """
     candidate_dir = os.path.join(settings.EVIDENCE_DIR, "candidates", student_id)
     evidence_list = []
@@ -999,6 +1159,10 @@ def get_candidate_evidence(student_id: str):
                         ev_type = "MULTIPLE_PERSONS"
                     elif "no_person" in file.lower():
                         ev_type = "NO_PERSON_DETECTED"
+
+                    # Skip evidence frames for items permitted under active policy
+                    if not policy_chatbot.is_violation_prohibited(ev_type):
+                        continue
 
                     evidence_list.append({
                         "student_id": student_id,

@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from app.config import settings
 from app.ai.detector import detector, AIDetector
 from app.ai.rule_engine import RuleEngine
+from app.ai.policy_chatbot import policy_chatbot
 from app.db.models import CandidateSubmissionModel
 
 logger = logging.getLogger("app.ai.video_processor")
@@ -141,6 +142,10 @@ class VideoProcessor:
 
                 for rule in triggered_rules:
                     event_type = rule["event_type"]
+                    # If permitted by active company RAG policy, do not treat as violation
+                    if not policy_chatbot.is_violation_prohibited(event_type):
+                        continue
+
                     rule_types_present.add(event_type)
 
                     if event_type not in active_intervals:
@@ -193,7 +198,7 @@ class VideoProcessor:
                     "timestamp_sec": round(current_time_sec, 2),
                     "formatted_timestamp": formatted_time,
                     "detections": detections,
-                    "events": [r["event_type"] for r in triggered_rules]
+                    "events": [r["event_type"] for r in triggered_rules if policy_chatbot.is_violation_prohibited(r["event_type"])]
                 })
 
             frame_idx += 1
@@ -291,6 +296,7 @@ class VideoProcessor:
                 overall_status=overall_status,
                 limit_exceeded=1 if overall_limit_exceeded else 0,
                 phone_duration_seconds=cumulative_durations.get("PHONE_DETECTED", 0.0),
+                device_duration_seconds=cumulative_durations.get("UNAUTHORIZED_DEVICE", 0.0),
                 missing_duration_seconds=cumulative_durations.get("NO_PERSON_DETECTED", 0.0),
                 multiple_persons_duration_seconds=cumulative_durations.get("MULTIPLE_PERSONS", 0.0),
                 report_json_path=report_json_path,

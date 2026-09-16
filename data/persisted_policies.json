@@ -1,0 +1,447 @@
+{
+  "active_company_id": "acme_global_technologies",
+  "client_companies": {
+    "techhire_global": {
+      "id": "techhire_global",
+      "name": "TechHire Global Enterprise Assessment",
+      "industry": "Software Engineering & Tech Hiring",
+      "strictness": "MAXIMUM_STRICT",
+      "description": "High-stakes technical recruitment assessment with zero electronic aids and solitary isolation.",
+      "policies": {
+        "PHONE": {
+          "clause": "TechHire Integrity Code Sec. 4.2",
+          "severity": "CRITICAL",
+          "rule": "Absolute Zero-Tolerance: No cell phones in room. Flagged keyframes archived to Admin Evidence Repository.",
+          "admin_action": "Review annotated mobile phone keyframe. Candidate received non-terminating warning.",
+          "allowed": false
+        },
+        "LAPTOP": {
+          "clause": "TechHire Hardware Protocol Sec. 4.3",
+          "severity": "HIGH",
+          "rule": "Secondary laptop or external display prohibited. Only authorized single primary laptop permitted.",
+          "admin_action": "Check for unauthorized second screen/IDE sharing in admin evidence.",
+          "allowed": false
+        },
+        "PERSON": {
+          "clause": "TechHire Workspace Isolation Sec. 5.1",
+          "severity": "HIGH",
+          "rule": "Solitary Room Policy: Secondary persons / double occupants strictly forbidden.",
+          "admin_action": "Inspect multi-occupant keyframe evidence. Solitary isolation warning dispatched.",
+          "allowed": false
+        }
+      }
+    },
+    "nta_standard": {
+      "id": "nta_standard",
+      "name": "National Testing Agency (NTA CBT Standards)",
+      "industry": "Government & Higher Education",
+      "strictness": "HIGH",
+      "description": "Standardized competitive entrance testing standard with strict government ID checks and device scanning.",
+      "policies": {
+        "PHONE": {
+          "clause": "NTA Examination Rules Sec. 6.1",
+          "severity": "CRITICAL",
+          "rule": "Zero Tolerance: Mobile phone presence is a severe breach. Keyframe sent to Chief Examiner.",
+          "admin_action": "Escalate to Center Superintendant via Admin Evidence Gallery.",
+          "allowed": false
+        },
+        "LAPTOP": {
+          "clause": "NTA Technical Standard Sec. 2.4",
+          "severity": "HIGH",
+          "rule": "Auxiliary computing machines or dual laptops strictly barred.",
+          "admin_action": "Verify device bounding box in Admin Portal.",
+          "allowed": false
+        },
+        "PERSON": {
+          "clause": "NTA Room Security Protocol Sec. 3.2",
+          "severity": "HIGH",
+          "rule": "No unauthorized invigilator or secondary person in testing chamber.",
+          "admin_action": "Examine intruder snapshot in Admin Dossier.",
+          "allowed": false
+        }
+      }
+    },
+    "fintech_secure": {
+      "id": "fintech_secure",
+      "name": "FinTech & Banking Certification Board",
+      "industry": "Financial Services & Banking Compliance",
+      "strictness": "REGULATORY_CRITICAL",
+      "description": "Regulatory examination requiring complete device shielding and compliance audit trails.",
+      "policies": {
+        "PHONE": {
+          "clause": "FinTech Compliance Standard 8.4",
+          "severity": "CRITICAL",
+          "rule": "Communication hardware breach. Frame captured for regulatory proctor review.",
+          "admin_action": "Compliance officer must audit evidence keyframe.",
+          "allowed": false
+        },
+        "LAPTOP": {
+          "clause": "FinTech InfoSec Protocol 3.9",
+          "severity": "HIGH",
+          "rule": "Unauthorized secondary computing node detected.",
+          "admin_action": "Inspect peripheral device layout in Admin Panel.",
+          "allowed": false
+        },
+        "PERSON": {
+          "clause": "FinTech Solitary Policy 2.1",
+          "severity": "HIGH",
+          "rule": "Secondary person presents insider collusion risk. Isolation required.",
+          "admin_action": "Review multi-person audit proof.",
+          "allowed": false
+        }
+      }
+    },
+    "persist_dynamics": {
+      "id": "persist_dynamics",
+      "name": "Persist Dynamics",
+      "industry": "Cloud Computing",
+      "strictness": "HIGH",
+      "description": "Ingested policy document (uploaded document). Enforces HIGH rules for Cloud Computing.",
+      "policies": {
+        "PHONE": {
+          "clause": "Persist Dynamics Policy Sec. 2.0 (Authorized Phone)",
+          "severity": "ALLOWED",
+          "rule": "Phone usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence.",
+          "admin_action": "Phone permitted by client policy. No violation logged.",
+          "allowed": true
+        },
+        "LAPTOP": {
+          "clause": "Persist Dynamics Clause 1.1",
+          "severity": "HIGH",
+          "rule": "Secondary Display / Machine Prohibition: Only the approved primary examination laptop may be active.",
+          "admin_action": "Verify secondary display / dual machine layout in Admin Evidence Gallery.",
+          "allowed": false
+        },
+        "PERSON": {
+          "clause": "Persist Dynamics Solitary Isolation Protocol Sec. 5.1",
+          "severity": "HIGH",
+          "rule": "Strict Solitary Isolation: Secondary individuals, assistants, or observers in the room are prohibited.",
+          "admin_action": "Audit multi-occupant snapshot and room isolation compliance.",
+          "allowed": false
+        }
+      },
+      "document_summary": "Successfully parsed policy document (67 chars). Allowed items: PHONE. Prohibited violations: LAPTOP, PERSON. Enforcing HIGH standards for Persist Dynamics.",
+      "raw_text_snippet": "Clause 1.1: Mobile devices permitted for login. Laptops prohibited."
+    },
+    "acme_global_cloud": {
+      "id": "acme_global_cloud",
+      "name": "Acme Global Cloud",
+      "industry": "Software Engineering",
+      "strictness": "MAXIMUM_STRICT",
+      "description": "Ingested policy document (uploaded document). Enforces MAXIMUM_STRICT rules for Software Engineering.",
+      "policies": {
+        "PHONE": {
+          "clause": "Acme Global Cloud Section 4.5",
+          "severity": "CRITICAL",
+          "rule": "Section 4.5: Prohibited Cellular Smartphones Cellular phones, smartphones, and communication accessories are barred from the testing desk.",
+          "admin_action": "Inspect annotated mobile phone evidence keyframe in Admin Dossier.",
+          "allowed": false
+        },
+        "LAPTOP": {
+          "clause": "Acme Global Cloud Section 4.8",
+          "severity": "CRITICAL",
+          "rule": "Section 4.8: Auxiliary Displays and Laptops Secondary laptops, external monitors, and tablet displays are strictly banned.",
+          "admin_action": "Verify secondary display / dual machine layout in Admin Evidence Gallery.",
+          "allowed": false
+        },
+        "PERSON": {
+          "clause": "Acme Global Cloud Section 3.1",
+          "severity": "CRITICAL",
+          "rule": "Section 3.1: Candidate Solitary Room Isolation The examinee must be alone in a secluded room. Double person or companion intrusion is prohibited.",
+          "admin_action": "Audit multi-occupant snapshot and room isolation compliance.",
+          "allowed": false
+        }
+      },
+      "document_summary": "Successfully parsed policy document (471 chars). Allowed items: None (Strict). Prohibited violations: PHONE, LAPTOP, PERSON. Enforcing MAXIMUM_STRICT standards for Acme Global Cloud.",
+      "raw_text_snippet": "ACME GLOBAL CLOUD TESTING BYLAWS 2026\n    Section 3.1: Candidate Solitary Room Isolation\n    The examinee must be alone in a secluded room. Double person or companion intrusion is prohibited.\n\n    Section 4.5: Prohibited Cellular Smartphones\n    Cellular phones, smartphones, and communication accessories are barred from the testing desk.\n\n    Section 4.8: Auxiliary Displays and Laptops\n    Secondary laptops, external monitors, and tablet displays are strictly banned."
+    },
+    "mobile_friendly_tech": {
+      "id": "mobile_friendly_tech",
+      "name": "Mobile Friendly Tech",
+      "industry": "Software Engineering",
+      "strictness": "MEDIUM",
+      "description": "Ingested policy document (uploaded document). Enforces MEDIUM rules for Software Engineering.",
+      "policies": {
+        "PHONE": {
+          "clause": "Mobile Friendly Tech Policy Sec. 2.0 (Authorized Phone)",
+          "severity": "ALLOWED",
+          "rule": "Phone usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence.",
+          "admin_action": "Phone permitted by client policy. No violation logged.",
+          "allowed": true
+        },
+        "LAPTOP": {
+          "clause": "Mobile Friendly Tech Section 4.3",
+          "severity": "HIGH",
+          "rule": "Section 4.3: Secondary Laptops Secondary laptops and external displays are strictly banned.",
+          "admin_action": "Verify secondary display / dual machine layout in Admin Evidence Gallery.",
+          "allowed": false
+        },
+        "PERSON": {
+          "clause": "Mobile Friendly Tech Section 5.1",
+          "severity": "HIGH",
+          "rule": "Section 5.1: Solitary Presence Solitary room isolation is mandatory; second persons are prohibited.",
+          "admin_action": "Audit multi-occupant snapshot and room isolation compliance.",
+          "allowed": false
+        }
+      },
+      "document_summary": "Successfully parsed policy document (405 chars). Allowed items: PHONE. Prohibited violations: LAPTOP, PERSON. Enforcing MEDIUM standards for Mobile Friendly Tech.",
+      "raw_text_snippet": "CLIENT INTEGRITY DIRECTIVE - MOBILE ENABLED\n    Section 1.1: Permitted Cellular Devices & 2FA\n    Mobile phones and cellular devices are explicitly allowed for candidate dual-factor authentication.\n    Section 4.3: Secondary Laptops\n    Secondary laptops and external displays are strictly banned.\n    Section 5.1: Solitary Presence\n    Solitary room isolation is mandatory; second persons are prohibited."
+    },
+    "linguistic_regex_enterprise": {
+      "id": "linguistic_regex_enterprise",
+      "name": "Linguistic Regex Enterprise",
+      "industry": "Consulting",
+      "strictness": "HIGH",
+      "description": "Ingested policy document (uploaded document). Enforces HIGH rules for Consulting.",
+      "policies": {
+        "PHONE": {
+          "clause": "Linguistic Regex Enterprise Policy Sec. 2.0 (Authorized Phone)",
+          "severity": "ALLOWED",
+          "rule": "Phone usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence.",
+          "admin_action": "Phone permitted by client policy. No violation logged.",
+          "allowed": true
+        },
+        "LAPTOP": {
+          "clause": "Linguistic Regex Enterprise Workstation Standard Sec. 4.3",
+          "severity": "HIGH",
+          "rule": "Auxiliary laptops and multiple persons in the room are strictly forbidden.",
+          "admin_action": "Verify secondary display / dual machine layout in Admin Evidence Gallery.",
+          "allowed": false
+        },
+        "PERSON": {
+          "clause": "Linguistic Regex Enterprise Solitary Isolation Protocol Sec. 5.1",
+          "severity": "HIGH",
+          "rule": "Auxiliary laptops and multiple persons in the room are strictly forbidden.",
+          "admin_action": "Audit multi-occupant snapshot and room isolation compliance.",
+          "allowed": false
+        }
+      },
+      "document_summary": "Successfully parsed policy document (240 chars). Allowed items: PHONE. Prohibited violations: LAPTOP, PERSON. Enforcing HIGH standards for Linguistic Regex Enterprise.",
+      "raw_text_snippet": "POLICY ON WORKSTATION HARDWARE:\n    Except the mobile phones which are allowed for login verification, all other electronic communication devices are prohibited.\n    Auxiliary laptops and multiple persons in the room are strictly forbidden."
+    },
+    "acme_global_technologies": {
+      "id": "acme_global_technologies",
+      "name": "Acme Global Technologies",
+      "industry": "Software & Cloud Engineering",
+      "strictness": "MAXIMUM_STRICT",
+      "description": "Ingested policy document (uploaded document). Enforces MAXIMUM_STRICT rules for Software & Cloud Engineering.",
+      "policies": {
+        "PHONE": {
+          "clause": "Acme Global Technologies Policy Sec. 2.0 (Authorized Phone)",
+          "severity": "ALLOWED",
+          "rule": "Phone usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence.",
+          "admin_action": "Phone permitted by client policy. No violation logged.",
+          "allowed": true
+        },
+        "LAPTOP": {
+          "clause": "Acme Global Technologies Policy Sec. 2.0 (Authorized Laptop)",
+          "severity": "ALLOWED",
+          "rule": "Laptop usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence.",
+          "admin_action": "Laptop permitted by client policy. No violation logged.",
+          "allowed": true
+        },
+        "PERSON": {
+          "clause": "Acme Global Technologies Solitary Isolation Protocol Sec. 5.1",
+          "severity": "CRITICAL",
+          "rule": "Strict Solitary Isolation: Secondary individuals, assistants, or observers in the room are prohibited.",
+          "admin_action": "Audit multi-occupant snapshot and room isolation compliance.",
+          "allowed": false
+        }
+      },
+      "document_summary": "Successfully parsed policy document (25 chars). Allowed items: PHONE, LAPTOP. Prohibited violations: PERSON. Enforcing MAXIMUM_STRICT standards for Acme Global Technologies.",
+      "raw_text_snippet": "except laptop violate all"
+    },
+    "laptop_strict_corp": {
+      "id": "laptop_strict_corp",
+      "name": "Laptop Strict Corp",
+      "industry": "IT Assessment",
+      "strictness": "HIGH",
+      "description": "Ingested policy document (uploaded document). Enforces HIGH rules for IT Assessment.",
+      "policies": {
+        "PHONE": {
+          "clause": "Laptop Strict Corp Policy Sec. 2.0 (Authorized Phone)",
+          "severity": "ALLOWED",
+          "rule": "Phone usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence.",
+          "admin_action": "Phone permitted by client policy. No violation logged.",
+          "allowed": true
+        },
+        "LAPTOP": {
+          "clause": "Laptop Strict Corp Workstation Standard Sec. 4.3",
+          "severity": "HIGH",
+          "rule": "Secondary Display / Machine Prohibition: Only the approved primary examination laptop may be active.",
+          "admin_action": "Verify secondary display / dual machine layout in Admin Evidence Gallery.",
+          "allowed": false
+        },
+        "PERSON": {
+          "clause": "Laptop Strict Corp Solitary Isolation Protocol Sec. 5.1",
+          "severity": "HIGH",
+          "rule": "Strict Solitary Isolation: Secondary individuals, assistants, or observers in the room are prohibited.",
+          "admin_action": "Audit multi-occupant snapshot and room isolation compliance.",
+          "allowed": false
+        }
+      },
+      "document_summary": "Successfully parsed policy document (104 chars). Allowed items: PHONE. Prohibited violations: LAPTOP, PERSON. Enforcing HIGH standards for Laptop Strict Corp.",
+      "raw_text_snippet": "Except mobile phones which are allowed for login, all secondary laptops and screens are strictly banned."
+    },
+    "multi_item_exemption_corp": {
+      "id": "multi_item_exemption_corp",
+      "name": "Multi Item Exemption Corp",
+      "industry": "Software & Cloud Engineering",
+      "strictness": "STANDARD",
+      "description": "Ingested policy document (uploaded document). Enforces STANDARD rules for Software & Cloud Engineering.",
+      "policies": {
+        "PHONE": {
+          "clause": "Multi Item Exemption Corp Policy Sec. 2.0 (Authorized Phone)",
+          "severity": "ALLOWED",
+          "rule": "Phone usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence.",
+          "admin_action": "Phone permitted by client policy. No violation logged.",
+          "allowed": true
+        },
+        "LAPTOP": {
+          "clause": "Multi Item Exemption Corp Policy Sec. 2.0 (Authorized Laptop)",
+          "severity": "ALLOWED",
+          "rule": "Laptop usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence.",
+          "admin_action": "Laptop permitted by client policy. No violation logged.",
+          "allowed": true
+        },
+        "PERSON": {
+          "clause": "Multi Item Exemption Corp Solitary Isolation Protocol Sec. 5.1",
+          "severity": "HIGH",
+          "rule": "Strict Solitary Isolation: Secondary individuals, assistants, or observers in the room are prohibited.",
+          "admin_action": "Audit multi-occupant snapshot and room isolation compliance.",
+          "allowed": false
+        }
+      },
+      "document_summary": "Successfully parsed policy document (28 chars). Allowed items: PHONE, LAPTOP. Prohibited violations: PERSON. Enforcing STANDARD standards for Multi Item Exemption Corp.",
+      "raw_text_snippet": "except the mobile laptop all"
+    }
+  },
+  "custom_articles": [
+    {
+      "id": "RULE-PERSIST_DYNAMICS",
+      "category": "CLIENT_POLICY",
+      "title": "Persist Dynamics Examination Regulations",
+      "keywords": [
+        "persist dynamics",
+        "client",
+        "custom policy",
+        "bylaws",
+        "rules"
+      ],
+      "content": "Policy for Persist Dynamics: Phone usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence. Clause 1.1: Mobile devices permitted for login. Laptops prohibited. Strict Solitary Isolation: Secondary individuals, assistants, or observers in the room are prohibited.",
+      "citation": "Persist Dynamics Code of Conduct"
+    },
+    {
+      "id": "RULE-ACME_GLOBAL_CLOUD",
+      "category": "CLIENT_POLICY",
+      "title": "Acme Global Cloud Examination Regulations",
+      "keywords": [
+        "acme global cloud",
+        "client",
+        "custom policy",
+        "bylaws",
+        "rules"
+      ],
+      "content": "Policy for Acme Global Cloud: Section 4.5: Prohibited Cellular Smartphones Cellular phones, smartphones, and communication accessories are barred from the testing desk. Section 4.8: Auxiliary Displays and Laptops Secondary laptops, external monitors, and tablet displays are strictly banned. Section 3.1: Candidate Solitary Room Isolation The examinee must be alone in a secluded room. Double person or companion intrusion is prohibited.",
+      "citation": "Acme Global Cloud Code of Conduct"
+    },
+    {
+      "id": "RULE-MOBILE_FRIENDLY_TECH",
+      "category": "CLIENT_POLICY",
+      "title": "Mobile Friendly Tech Examination Regulations",
+      "keywords": [
+        "mobile friendly tech",
+        "client",
+        "custom policy",
+        "bylaws",
+        "rules"
+      ],
+      "content": "Policy for Mobile Friendly Tech: Phone usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence. Section 4.3: Secondary Laptops Secondary laptops and external displays are strictly banned. Section 5.1: Solitary Presence Solitary room isolation is mandatory; second persons are prohibited.",
+      "citation": "Mobile Friendly Tech Code of Conduct"
+    },
+    {
+      "id": "RULE-LINGUISTIC_REGEX_ENTERPRISE",
+      "category": "CLIENT_POLICY",
+      "title": "Linguistic Regex Enterprise Examination Regulations",
+      "keywords": [
+        "linguistic regex enterprise",
+        "client",
+        "custom policy",
+        "bylaws",
+        "rules"
+      ],
+      "content": "Policy for Linguistic Regex Enterprise: Phone usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence. Auxiliary laptops and multiple persons in the room are strictly forbidden. Auxiliary laptops and multiple persons in the room are strictly forbidden.",
+      "citation": "Linguistic Regex Enterprise Code of Conduct"
+    },
+    {
+      "id": "RULE-ACME_GLOBAL_TECHNOLOGIES",
+      "category": "CLIENT_POLICY",
+      "title": "Acme Global Technologies Examination Regulations",
+      "keywords": [
+        "acme global technologies",
+        "client",
+        "custom policy",
+        "bylaws",
+        "rules"
+      ],
+      "content": "Policy for Acme Global Technologies: excet the mobile the other devices should be violated Secondary Display / Machine Prohibition: Only the approved primary examination laptop may be active. Strict Solitary Isolation: Secondary individuals, assistants, or observers in the room are prohibited.",
+      "citation": "Acme Global Technologies Code of Conduct"
+    },
+    {
+      "id": "RULE-LAPTOP_STRICT_CORP",
+      "category": "CLIENT_POLICY",
+      "title": "Laptop Strict Corp Examination Regulations",
+      "keywords": [
+        "laptop strict corp",
+        "client",
+        "custom policy",
+        "bylaws",
+        "rules"
+      ],
+      "content": "Policy for Laptop Strict Corp: Phone usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence. Secondary Display / Machine Prohibition: Only the approved primary examination laptop may be active. Strict Solitary Isolation: Secondary individuals, assistants, or observers in the room are prohibited.",
+      "citation": "Laptop Strict Corp Code of Conduct"
+    },
+    {
+      "id": "RULE-MULTI_ITEM_EXEMPTION_CORP",
+      "category": "CLIENT_POLICY",
+      "title": "Multi Item Exemption Corp Examination Regulations",
+      "keywords": [
+        "multi item exemption corp",
+        "client",
+        "custom policy",
+        "bylaws",
+        "rules"
+      ],
+      "content": "Policy for Multi Item Exemption Corp: Phone usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence. Laptop usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence. Strict Solitary Isolation: Secondary individuals, assistants, or observers in the room are prohibited.",
+      "citation": "Multi Item Exemption Corp Code of Conduct"
+    },
+    {
+      "id": "RULE-ACME_GLOBAL_TECHNOLOGIES",
+      "category": "CLIENT_POLICY",
+      "title": "Acme Global Technologies Examination Regulations",
+      "keywords": [
+        "acme global technologies",
+        "client",
+        "custom policy",
+        "bylaws",
+        "rules"
+      ],
+      "content": "Policy for Acme Global Technologies: Zero-Tolerance Mobile Devices: Cellular phones and electronic gadgets are strictly banned in testing room. Laptop usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence. Strict Solitary Isolation: Secondary individuals, assistants, or observers in the room are prohibited.",
+      "citation": "Acme Global Technologies Code of Conduct"
+    },
+    {
+      "id": "RULE-ACME_GLOBAL_TECHNOLOGIES",
+      "category": "CLIENT_POLICY",
+      "title": "Acme Global Technologies Examination Regulations",
+      "keywords": [
+        "acme global technologies",
+        "client",
+        "custom policy",
+        "bylaws",
+        "rules"
+      ],
+      "content": "Policy for Acme Global Technologies: Phone usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence. Laptop usage is authorized/permitted under client policy. Detection will NOT be treated as a violation or archived as breach evidence. Strict Solitary Isolation: Secondary individuals, assistants, or observers in the room are prohibited.",
+      "citation": "Acme Global Technologies Code of Conduct"
+    }
+  ]
+}

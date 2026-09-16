@@ -52,6 +52,7 @@ class CandidateSubmissionResponse(BaseModel):
     overall_status: str
     limit_exceeded: int
     phone_duration_seconds: float
+    device_duration_seconds: float = 0.0
     missing_duration_seconds: float
     multiple_persons_duration_seconds: float
     report_json_path: str
@@ -254,3 +255,28 @@ class AdminPolicyBreachesResponse(BaseModel):
     total_breaches: int
     active_company: str
     breaches: List[AdminPolicyBreachItem]
+
+
+class PolicyDocumentIngestRequest(BaseModel):
+    company_name: str = Field(..., description="Client or hiring organization name")
+    industry: Optional[str] = Field("Technology", description="Industry domain")
+    strictness: Optional[str] = Field("HIGH", description="Enforcement level: MAXIMUM_STRICT, REGULATORY_CRITICAL, HIGH, STANDARD")
+    document_text: Optional[str] = Field("", description="Raw policy terms, rules, and integrity clauses")
+    document_filename: Optional[str] = Field(None, description="Original filename if uploaded")
+    file_b64: Optional[str] = Field(None, description="Base64 encoded document file data")
+    phone_allowed: Optional[bool] = Field(None, description="Explicitly allow/permit mobile phones")
+    laptop_allowed: Optional[bool] = Field(None, description="Explicitly allow/permit secondary laptops")
+    person_allowed: Optional[bool] = Field(None, description="Explicitly allow/permit secondary persons")
+
+
+
+class PolicyDocumentIngestResponse(BaseModel):
+    success: bool
+    company_id: str
+    company_name: str
+    strictness: str
+    document_summary: str
+    defined_breaches: Dict[str, Any]
+    active_company: Dict[str, Any]
+    message: str
+

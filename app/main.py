@@ -9,6 +9,15 @@ from app.api.endpoints import router as api_router
 
 # Initialize database tables
 Base.metadata.create_all(bind=engine)
+try:
+    with engine.connect() as conn:
+        res = conn.exec_driver_sql("PRAGMA table_info(candidate_submissions)").fetchall()
+        cols = [r[1] for r in res]
+        if "device_duration_seconds" not in cols:
+            conn.exec_driver_sql("ALTER TABLE candidate_submissions ADD COLUMN device_duration_seconds FLOAT DEFAULT 0.0")
+            conn.commit()
+except Exception:
+    pass
 
 app = FastAPI(
     title=settings.PROJECT_NAME,

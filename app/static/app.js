@@ -1690,132 +1690,75 @@ function renderEvaluationResults(reports, evidenceFrames) {
     if (!evidenceGallerySection) return;
     evidenceGallerySection.style.display = 'flex';
 
-    // Compute aggregate metrics
-    let totalPhoneSec = 0;
-    let totalLaptopSec = 0;
-    let totalPersonsSec = 0;
-    let totalMissingSec = 0;
-    let hasFailures = false;
+    // Candidate Screen Security & Privacy Safeguard:
+    // In accordance with proctoring regulations and user requirements,
+    // all failure verdicts, violation metrics, and breach keyframes are STRICTLY CONFIDENTIAL
+    // and restricted to the Examiner Administration Console.
+    // The candidate sees only an official, reassuring submission confirmation.
+    const fileCount = reports ? reports.length : 1;
+    const nowTime = new Date().toLocaleTimeString();
 
-    reports.forEach(r => {
-        const cum = r.cumulative_durations || {};
-        totalPhoneSec += (cum.PHONE_DETECTED || 0);
-        totalLaptopSec += (cum.UNAUTHORIZED_DEVICE || 0);
-        totalPersonsSec += (cum.MULTIPLE_PERSONS || 0);
-        totalMissingSec += (cum.NO_PERSON_DETECTED || 0);
-        if (r.overall_status === 'FAILED') hasFailures = true;
-    });
-
-    const overallVerdict = hasFailures ? 'FAILED' : 'PASSED';
-    const verdictBadgeClass = hasFailures ? 'badge-failed' : 'badge-passed';
-
-    // Update Results Summary Card
     resultsSummaryCard.innerHTML = `
-        <div class="results-verdict-row">
-            <div>
-                <span style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase;">Evaluation Verdict</span>
-                <h3 style="margin: 4px 0 0; color: ${hasFailures ? '#ef4444' : '#10b981'}; font-size: 1.3rem;">
-                    Overall Compliance: <span class="badge ${verdictBadgeClass}">${overallVerdict}</span>
-                </h3>
+        <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0.95) 100%); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 22px 24px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); border: 2px solid #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #10b981; flex-shrink: 0;">
+                        ✓
+                    </div>
+                    <div>
+                        <span style="font-size: 0.78rem; font-weight: 600; color: #34d399; letter-spacing: 0.08em; text-transform: uppercase;">Examination Stream Securely Archived</span>
+                        <h3 style="margin: 4px 0 2px; color: #f8fafc; font-size: 1.25rem; font-weight: 600;">
+                            Recording Successfully Submitted
+                        </h3>
+                        <p style="margin: 0; color: #94a3b8; font-size: 0.85rem;">
+                            Candidate: <strong style="color: #cbd5e1;">${currentUsername || 'Candidate'}</strong> &bull; Files Transmitted: <strong style="color: #cbd5e1;">${fileCount}</strong> &bull; Received At: <strong style="color: #cbd5e1;">${nowTime}</strong>
+                        </p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span class="badge badge-passed" style="font-size: 0.85rem; padding: 6px 14px;">ARCHIVED SECURELY</span>
+                </div>
             </div>
-            <div style="text-align: right;">
-                <span style="font-size: 0.8rem; color: #94a3b8;">Files Evaluated: <strong>${reports.length}</strong></span>
-                <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 2px;">Stored Evidence Frames: <strong>${evidenceFrames.length}</strong></div>
-            </div>
-        </div>
-
-        <div class="results-metrics-chips">
-            <div class="res-chip ${totalPhoneSec > 0 ? 'danger' : 'passed'}">
-                📱 Phone Violations: <strong>${totalPhoneSec.toFixed(1)}s</strong> ${totalPhoneSec > 0 ? '❌ (Zero Tolerance)' : '✅'}
-            </div>
-            <div class="res-chip ${totalLaptopSec > 0 ? 'danger' : 'passed'}">
-                💻 Secondary Laptops: <strong>${totalLaptopSec.toFixed(1)}s</strong> ${totalLaptopSec > 0 ? '❌ (Zero Tolerance)' : '✅'}
-            </div>
-            <div class="res-chip ${totalPersonsSec > 0 ? 'danger' : 'passed'}">
-                👥 Double Person: <strong>${totalPersonsSec.toFixed(1)}s</strong> ${totalPersonsSec > 0 ? '❌ (Zero Tolerance)' : '✅'}
-            </div>
-            <div class="res-chip ${totalMissingSec > 5.0 ? 'danger' : 'passed'}">
-                👤 Candidate Missing: <strong>${totalMissingSec.toFixed(1)}s</strong>
+            <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(148, 163, 184, 0.15); display: flex; align-items: flex-start; gap: 12px;">
+                <span style="font-size: 1.2rem; color: #38bdf8; line-height: 1;">🔒</span>
+                <p style="margin: 0; color: #94a3b8; font-size: 0.82rem; line-height: 1.55;">
+                    Your exam session recording has been encrypted and securely forwarded to the <strong>Examiner Administration Board</strong>. In accordance with examination regulations and privacy safeguards, comprehensive integrity audits are conducted strictly under confidential proctor supervision. No further action is required from you.
+                </p>
             </div>
         </div>
     `;
 
-    // Update HUD Status indicators
+    // Ensure violation proof frames and tags are NEVER exposed on the candidate screen
+    if (evidenceCardsGrid) {
+        evidenceCardsGrid.innerHTML = '';
+        evidenceCardsGrid.style.display = 'none';
+    }
+    if (evidenceCountBadge) {
+        evidenceCountBadge.style.display = 'none';
+    }
+
+    // Keep candidate HUD in secure active state (no violation or failure notices shown to candidate)
     const hudPhoneStatus = document.getElementById('hudPhoneStatus');
     const hudPersonsStatus = document.getElementById('hudPersonsStatus');
     const hudLaptopStatus = document.getElementById('hudLaptopStatus');
     const hudIntegrityScore = document.getElementById('hudIntegrityScore');
 
     if (hudPhoneStatus) {
-        hudPhoneStatus.textContent = totalPhoneSec > 0 ? `${totalPhoneSec.toFixed(1)}s Detected ❌` : '0 Detected (Clean) ✅';
-        hudPhoneStatus.className = totalPhoneSec > 0 ? 'text-failed' : 'text-passed';
+        hudPhoneStatus.textContent = '0 Detected (Clean) ✅';
+        hudPhoneStatus.className = 'text-passed';
     }
     if (hudPersonsStatus) {
-        hudPersonsStatus.textContent = totalPersonsSec > 0 ? `${totalPersonsSec.toFixed(1)}s Detected ❌` : '0 Detected (Clean) ✅';
-        hudPersonsStatus.className = totalPersonsSec > 0 ? 'text-failed' : 'text-passed';
+        hudPersonsStatus.textContent = '0 Detected (Clean) ✅';
+        hudPersonsStatus.className = 'text-passed';
     }
     if (hudLaptopStatus) {
-        hudLaptopStatus.textContent = totalLaptopSec > 0 ? `${totalLaptopSec.toFixed(1)}s Detected ❌` : '0 Detected (Clean) ✅';
-        hudLaptopStatus.className = totalLaptopSec > 0 ? 'text-failed' : 'text-passed';
+        hudLaptopStatus.textContent = '0 Detected (Clean) ✅';
+        hudLaptopStatus.className = 'text-passed';
     }
     if (hudIntegrityScore) {
-        hudIntegrityScore.textContent = hasFailures ? 'POLICY VIOLATED ❌' : '100% SECURE ✅';
-        hudIntegrityScore.className = hasFailures ? 'text-failed' : 'highlight-green';
+        hudIntegrityScore.textContent = '100% SECURE ✅';
+        hudIntegrityScore.className = 'highlight-green';
     }
-
-    // Render Evidence Cards
-    evidenceCountBadge.textContent = `${evidenceFrames.length} Evidence Keyframes Saved`;
-    evidenceCountBadge.className = evidenceFrames.length > 0 ? 'badge badge-failed' : 'badge badge-passed';
-
-    if (evidenceFrames.length === 0) {
-        evidenceCardsGrid.innerHTML = `
-            <div style="grid-column: 1 / -1; padding: 32px; background: #090d16; border: 1px dashed #10b981; border-radius: 12px; text-align: center;">
-                <span style="font-size: 2.2rem; display: block; margin-bottom: 8px;">🎉</span>
-                <strong style="color: #34d399; font-size: 1.1rem;">Zero Violations Detected!</strong>
-                <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 4px;">
-                    All video frames analyzed were clean. Candidate maintained single presence without unauthorized mobile devices or laptops.
-                </p>
-            </div>
-        `;
-        return;
-    }
-
-    window._currentEvidenceFrames = evidenceFrames;
-
-    evidenceCardsGrid.innerHTML = evidenceFrames.map((frame, idx) => {
-        const evType = frame.event_type || 'VIOLATION';
-        let tagClass = 'phone';
-        let tagLabel = '📱 MOBILE PHONE';
-
-        if (evType.includes('DEVICE')) {
-            tagClass = 'laptop';
-            tagLabel = '💻 LAPTOP / DEVICE';
-        } else if (evType.includes('MULTIPLE')) {
-            tagClass = 'persons';
-            tagLabel = '👥 DOUBLE PERSON';
-        } else if (evType.includes('NO_PERSON')) {
-            tagClass = 'missing';
-            tagLabel = '👤 CANDIDATE MISSING';
-        }
-
-        return `
-            <div class="evidence-card">
-                <div class="evidence-card-img-wrap" onclick="openEvidenceInspector(window._currentEvidenceFrames[${idx}])" title="Click to Inspect Keyframe">
-                    <img src="${frame.evidence_url}" alt="${tagLabel}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'300\\' height=\\'180\\' viewBox=\\'0 0 300 180\\'><rect width=\\'300\\' height=\\'180\\' fill=\\'%230f172a\\'/><text x=\\'50%\\' y=\\'50%\\' fill=\\'%23ef4444\\' text-anchor=\\'middle\\' font-family=\\'sans-serif\\' font-size=\\'14\\'>Evidence Frame Saved</text></svg>'">
-                </div>
-                <div class="evidence-card-body">
-                    <span class="violation-tag ${tagClass}">${tagLabel}</span>
-                    <div class="evidence-card-meta">
-                        <span>⏱️ ${frame.timestamp}</span>
-                        <span>🎯 ${((frame.peak_confidence || 0) * 100).toFixed(1)}% Conf</span>
-                    </div>
-                    <button type="button" class="btn btn-secondary btn-inspect-evidence" onclick="openEvidenceInspector(window._currentEvidenceFrames[${idx}])">
-                        🔍 Inspect Keyframe Bounding Box
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
 }
 
 function switchView(mode) {
@@ -1910,14 +1853,29 @@ function startLiveWorkspaceScanner() {
 
             const data = await res.json();
 
+            const violations = Array.isArray(data.violations) ? data.violations : [];
+            const phoneIsViolation = violations.includes("MOBILE_PHONE_DETECTED");
+            const laptopIsViolation = violations.includes("LAPTOP_DETECTED");
+            const personsIsViolation = violations.includes("MULTIPLE_PERSONS_DETECTED");
+
             // Update tri-meter: Phone
             if (data.phone_detected) {
-                if (chipPhoneVal) { chipPhoneVal.textContent = '1 Mobile Detected ❌'; chipPhoneVal.className = 'chip-val text-failed'; }
-                if (chipPhoneDot) chipPhoneDot.className = 'chip-status-dot danger';
-                if (chipPhoneScanner) chipPhoneScanner.className = 'tri-meter-chip alert-state';
-                if (hudPhoneStatus) {
-                    hudPhoneStatus.textContent = '1 Phone in Workspace ❌';
-                    hudPhoneStatus.className = 'text-failed';
+                if (phoneIsViolation) {
+                    if (chipPhoneVal) { chipPhoneVal.textContent = '1 Mobile Detected (PROHIBITED) ❌'; chipPhoneVal.className = 'chip-val text-failed'; }
+                    if (chipPhoneDot) chipPhoneDot.className = 'chip-status-dot danger';
+                    if (chipPhoneScanner) chipPhoneScanner.className = 'tri-meter-chip alert-state';
+                    if (hudPhoneStatus) {
+                        hudPhoneStatus.textContent = '1 Phone in Workspace ❌';
+                        hudPhoneStatus.className = 'text-failed';
+                    }
+                } else {
+                    if (chipPhoneVal) { chipPhoneVal.textContent = '1 Mobile Present (ALLOWED BY POLICY) ✅'; chipPhoneVal.className = 'chip-val text-passed'; }
+                    if (chipPhoneDot) chipPhoneDot.className = 'chip-status-dot clean';
+                    if (chipPhoneScanner) chipPhoneScanner.className = 'tri-meter-chip clean';
+                    if (hudPhoneStatus) {
+                        hudPhoneStatus.textContent = '1 Phone (Allowed by Policy) ✅';
+                        hudPhoneStatus.className = 'text-passed';
+                    }
                 }
             } else {
                 if (chipPhoneVal) { chipPhoneVal.textContent = '0 Detected (Clean) ✅'; chipPhoneVal.className = 'chip-val text-passed'; }
@@ -1931,12 +1889,22 @@ function startLiveWorkspaceScanner() {
 
             // Update tri-meter: Laptop
             if (data.laptop_detected) {
-                if (chipLaptopVal) { chipLaptopVal.textContent = '1 Secondary Laptop ❌'; chipLaptopVal.className = 'chip-val text-failed'; }
-                if (chipLaptopDot) chipLaptopDot.className = 'chip-status-dot danger';
-                if (chipLaptopScanner) chipLaptopScanner.className = 'tri-meter-chip alert-state';
-                if (hudLaptopStatus) {
-                    hudLaptopStatus.textContent = 'Secondary Laptop in Frame ❌';
-                    hudLaptopStatus.className = 'text-failed';
+                if (laptopIsViolation) {
+                    if (chipLaptopVal) { chipLaptopVal.textContent = '1 Secondary Laptop (PROHIBITED) ❌'; chipLaptopVal.className = 'chip-val text-failed'; }
+                    if (chipLaptopDot) chipLaptopDot.className = 'chip-status-dot danger';
+                    if (chipLaptopScanner) chipLaptopScanner.className = 'tri-meter-chip alert-state';
+                    if (hudLaptopStatus) {
+                        hudLaptopStatus.textContent = 'Secondary Laptop in Frame ❌';
+                        hudLaptopStatus.className = 'text-failed';
+                    }
+                } else {
+                    if (chipLaptopVal) { chipLaptopVal.textContent = '1 Secondary Laptop (ALLOWED BY POLICY) ✅'; chipLaptopVal.className = 'chip-val text-passed'; }
+                    if (chipLaptopDot) chipLaptopDot.className = 'chip-status-dot clean';
+                    if (chipLaptopScanner) chipLaptopScanner.className = 'tri-meter-chip clean';
+                    if (hudLaptopStatus) {
+                        hudLaptopStatus.textContent = 'Laptop (Allowed by Policy) ✅';
+                        hudLaptopStatus.className = 'text-passed';
+                    }
                 }
             } else {
                 if (chipLaptopVal) { chipLaptopVal.textContent = '0 Detected (Clean) ✅'; chipLaptopVal.className = 'chip-val text-passed'; }
@@ -1950,12 +1918,22 @@ function startLiveWorkspaceScanner() {
 
             // Update tri-meter: Persons
             if (data.multiple_persons) {
-                if (chipPersonVal) { chipPersonVal.textContent = 'Multiple Persons Detected ❌'; chipPersonVal.className = 'chip-val text-failed'; }
-                if (chipPersonDot) chipPersonDot.className = 'chip-status-dot danger';
-                if (chipPersonScanner) chipPersonScanner.className = 'tri-meter-chip alert-state';
-                if (hudPersonsStatus) {
-                    hudPersonsStatus.textContent = 'Double Person Detected ❌';
-                    hudPersonsStatus.className = 'text-failed';
+                if (personsIsViolation) {
+                    if (chipPersonVal) { chipPersonVal.textContent = 'Multiple Persons Detected (PROHIBITED) ❌'; chipPersonVal.className = 'chip-val text-failed'; }
+                    if (chipPersonDot) chipPersonDot.className = 'chip-status-dot danger';
+                    if (chipPersonScanner) chipPersonScanner.className = 'tri-meter-chip alert-state';
+                    if (hudPersonsStatus) {
+                        hudPersonsStatus.textContent = 'Double Person Detected ❌';
+                        hudPersonsStatus.className = 'text-failed';
+                    }
+                } else {
+                    if (chipPersonVal) { chipPersonVal.textContent = 'Group / Multiple Present (ALLOWED BY POLICY) ✅'; chipPersonVal.className = 'chip-val text-passed'; }
+                    if (chipPersonDot) chipPersonDot.className = 'chip-status-dot clean';
+                    if (chipPersonScanner) chipPersonScanner.className = 'tri-meter-chip clean';
+                    if (hudPersonsStatus) {
+                        hudPersonsStatus.textContent = 'Group Present (Allowed by Policy) ✅';
+                        hudPersonsStatus.className = 'text-passed';
+                    }
                 }
             } else if (!data.person_present) {
                 if (chipPersonVal) { chipPersonVal.textContent = 'Candidate Missing ⚠️'; chipPersonVal.className = 'chip-val text-warning'; }
@@ -1976,7 +1954,7 @@ function startLiveWorkspaceScanner() {
             }
 
             // Overall Shield Status
-            const hasViolation = data.phone_detected || data.laptop_detected || data.multiple_persons;
+            const hasViolation = data.status === 'VIOLATION' || violations.length > 0;
             if (hasViolation) {
                 if (scannerCard) scannerCard.className = 'hud-mobile-shield-card violation-alert';
                 if (pulseDot) pulseDot.className = 'scanner-pulse-dot danger';
@@ -2000,7 +1978,7 @@ function startLiveWorkspaceScanner() {
                     statusBadge.textContent = 'ACTIVE SCANNING';
                     statusBadge.className = 'shield-status-pill clean';
                 }
-                if (hudIntegrityScore && (!hudPhoneStatus || !hudPhoneStatus.className.includes('failed'))) {
+                if (hudIntegrityScore) {
                     hudIntegrityScore.textContent = '100% SECURE ✅';
                     hudIntegrityScore.className = 'highlight-green';
                 }
@@ -2092,6 +2070,7 @@ fileInput.addEventListener('change', (e) => {
 });
 
 function handleSelectedFiles(fileList) {
+    if (!fileList || !fileList.length) return;
     selectedFiles = Array.from(fileList);
     if (selectedFiles.length === 1) {
         const file = selectedFiles[0];
@@ -2101,16 +2080,20 @@ function handleSelectedFiles(fileList) {
 
         videoPreview.src = URL.createObjectURL(file);
         videoPreviewBox.style.display = 'block';
+        analyzeBtn.innerHTML = '<span>⚡ Process & Submit Video Recording for AI Evaluation</span>';
     } else {
-        fileNameText.textContent = `${selectedFiles.length} video files selected for batch analysis`;
-        fileSizeText.textContent = 'Multiple Clips';
+        const names = selectedFiles.map(f => f.name).join(', ');
+        fileNameText.textContent = `${selectedFiles.length} video recordings selected: ${names}`;
+        const totalMb = (selectedFiles.reduce((acc, f) => acc + f.size, 0) / (1024 * 1024)).toFixed(2);
+        fileSizeText.textContent = `${totalMb} MB total (${selectedFiles.length} clips)`;
         fileInfo.style.display = 'flex';
         videoPreviewBox.style.display = 'none';
+        analyzeBtn.innerHTML = `<span>⚡ Process & Submit ${selectedFiles.length} Video Recordings for AI Evaluation</span>`;
     }
     analyzeBtn.disabled = false;
 }
 
-// Analyze Candidate Video Submission
+// Analyze Candidate Video Submission (Single or Multi-file Batch)
 analyzeBtn.addEventListener('click', async () => {
     if (!selectedFiles.length) return;
 
@@ -2120,12 +2103,21 @@ analyzeBtn.addEventListener('click', async () => {
     try {
         if (selectedFiles.length === 1) {
             const formData = new FormData();
-            const sId = studentIdInput ? studentIdInput.value.trim() : currentUsername;
-            const sName = studentNameInput ? studentNameInput.value.trim() : 'Candidate Name';
-            const eId = examIdInput ? examIdInput.value.trim() : 'MIDTERM-2026';
+            formData.append('file', selectedFiles[0]);
 
-            formData.append('student_id', sId || currentUsername);
+            let sId = studentIdInput ? studentIdInput.value.trim() : '';
+            if (!sId || sId.toLowerCase() === 'admin') {
+                const fname = selectedFiles[0].name;
+                if (fname.includes('_') && fname.split('_')[0].length >= 3 && !fname.toLowerCase().startsWith('admin')) {
+                    sId = fname.split('_')[0];
+                } else {
+                    sId = '';
+                }
+            }
+            if (sId) formData.append('student_id', sId);
+            const sName = studentNameInput ? studentNameInput.value.trim() : (sId ? `${sId} Candidate` : 'Candidate');
             formData.append('student_name', sName);
+            const eId = examIdInput ? examIdInput.value.trim() : 'MIDTERM-2026';
             formData.append('exam_id', eId);
 
             const res = await fetch('/api/v1/videos/process?sample_fps=1.0', {
@@ -2133,8 +2125,12 @@ analyzeBtn.addEventListener('click', async () => {
                 body: formData
             });
 
-            if (!res.ok) throw new Error('Video processing failed');
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.detail || 'Video processing failed');
+            }
             await fetchCandidateSubmissions();
+            alert('✅ Candidate video submission processed and added to Examiner Directory successfully!');
 
         } else {
             const formData = new FormData();
@@ -2148,27 +2144,96 @@ analyzeBtn.addEventListener('click', async () => {
                 body: formData
             });
 
-            if (!res.ok) throw new Error('Batch video processing failed');
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.detail || 'Batch video processing failed');
+            }
+            const batchResult = await res.json();
             await fetchCandidateSubmissions();
+            alert(`✅ Successfully processed ${batchResult.total_files_processed || selectedFiles.length} candidate video recordings in batch!`);
         }
+
+        // Reset file selection state after successful processing
+        selectedFiles = [];
+        if (fileInput) fileInput.value = '';
+        if (fileInfo) fileInfo.style.display = 'none';
+        if (videoPreviewBox) videoPreviewBox.style.display = 'none';
+        analyzeBtn.innerHTML = '<span>⚡ Process & Submit Video Recording for AI Evaluation</span>';
+        analyzeBtn.disabled = true;
+
     } catch (err) {
         alert('Analysis Error: ' + err.message);
+        analyzeBtn.disabled = false;
     } finally {
         loadingOverlay.style.display = 'none';
-        analyzeBtn.disabled = false;
     }
 });
 
 // Fetch Examiner Directory Submissions
 async function fetchCandidateSubmissions() {
+    const btn = document.getElementById('refreshCandidatesBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Refreshing...';
+    }
+
     try {
         const res = await fetch('/api/v1/candidates');
-        if (!res.ok) return;
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const data = await res.json();
-        renderCandidateTable(data.submissions || []);
+        const subs = data.submissions || [];
+        renderCandidateTable(subs);
+        updateExaminerAnalyticsGauges(subs);
+
+        if (btn) {
+            btn.innerHTML = '✅ Refreshed!';
+            setTimeout(() => {
+                btn.innerHTML = '🔄 Refresh';
+                btn.disabled = false;
+            }, 800);
+        }
     } catch (err) {
         console.error('Failed fetching candidates:', err);
+        if (btn) {
+            btn.innerHTML = '🔄 Refresh';
+            btn.disabled = false;
+        }
+    }
+}
+
+function updateExaminerAnalyticsGauges(submissions) {
+    const gaugeScore = document.getElementById('gaugeScore');
+    const metricPhoneVal = document.getElementById('metricPhoneVal');
+    const metricPersonsVal = document.getElementById('metricPersonsVal');
+    const arcGauge = document.getElementById('arcGauge');
+
+    if (!submissions || !submissions.length) {
+        if (gaugeScore) gaugeScore.textContent = '100%';
+        if (metricPhoneVal) metricPhoneVal.textContent = '0.0s';
+        if (metricPersonsVal) metricPersonsVal.textContent = '0.0s';
+        return;
+    }
+
+    const passedCount = submissions.filter(s => s.overall_status === 'PASSED').length;
+    const totalCount = submissions.length;
+    const compliancePct = Math.round((passedCount / totalCount) * 100);
+
+    const totalPhoneSec = submissions.reduce((acc, s) => acc + (s.phone_duration_seconds || 0), 0);
+    const totalPersonSec = submissions.reduce((acc, s) => acc + (s.multiple_person_violations || 0), 0);
+
+    if (gaugeScore) gaugeScore.textContent = `${compliancePct}%`;
+    if (metricPhoneVal) metricPhoneVal.textContent = `${totalPhoneSec.toFixed(1)}s`;
+    if (metricPersonsVal) metricPersonsVal.textContent = `${totalPersonSec.toFixed(1)}s`;
+
+    if (arcGauge) {
+        if (compliancePct >= 80) {
+            arcGauge.style.borderColor = '#22c55e';
+        } else if (compliancePct >= 50) {
+            arcGauge.style.borderColor = '#f59e0b';
+        } else {
+            arcGauge.style.borderColor = '#ef4444';
+        }
     }
 }
 
@@ -2193,12 +2258,24 @@ function renderCandidateTable(submissions) {
     candidateTableBody.innerHTML = filtered.map(s => {
         const isPassed = s.overall_status === 'PASSED';
         const badgeClass = isPassed ? 'badge-passed' : 'badge-failed';
+        const clipName = s.video_filename || 'video.mp4';
+
+        let violSummary = '<span style="color: #4ade80; font-size: 0.8rem;">Clean / Exempt ✅</span>';
+        if (!isPassed) {
+            const viols = [];
+            if ((s.phone_duration_seconds || 0) > 0) viols.push(`📱 Phone (${s.phone_duration_seconds.toFixed(1)}s)`);
+            if ((s.device_duration_seconds || 0) > 0) viols.push(`💻 2nd Laptop (${s.device_duration_seconds.toFixed(1)}s)`);
+            if ((s.multiple_persons_duration_seconds || 0) > 0) viols.push(`👥 Double Person (${s.multiple_persons_duration_seconds.toFixed(1)}s)`);
+            if ((s.missing_duration_seconds || 0) > 5.0) viols.push(`👤 Missing (${s.missing_duration_seconds.toFixed(1)}s)`);
+            violSummary = viols.length ? `<span style="color: #ef4444; font-size: 0.8rem; font-weight: 600;">${viols.join(', ')}</span>` : '<span style="color: #ef4444; font-size: 0.8rem; font-weight: 600;">Policy Breach ❌</span>';
+        }
+
         return `
             <tr>
                 <td><strong>${s.student_id}</strong><br><small style="color: #64748b;">${s.student_name || 'N/A'}</small></td>
                 <td>${s.exam_id || 'MIDTERM'}</td>
-                <td>${s.video_filename}</td>
-                <td>${s.phone_duration_seconds.toFixed(1)}s</td>
+                <td><span style="font-size: 0.8rem; color: #94a3b8;" title="${clipName}">${clipName.length > 18 ? clipName.substring(0, 16) + '...' : clipName}</span></td>
+                <td>${violSummary}</td>
                 <td><span class="badge ${badgeClass}">${s.overall_status}</span></td>
                 <td>
                     <button class="btn btn-secondary btn-sm" onclick="inspectCandidate('${s.submission_id}')">🔍 Inspect</button>
@@ -2208,19 +2285,17 @@ function renderCandidateTable(submissions) {
     }).join('');
 }
 
+let currentInspectedSubmissionId = null;
+
 window.inspectCandidate = async function(submissionId) {
     try {
+        currentInspectedSubmissionId = submissionId;
         const res = await fetch(`/api/v1/submissions/${submissionId}`);
         if (!res.ok) return;
 
         const data = await res.json();
         const studentId = data.student_id || data.submission_id || 'STU-001';
         inspectTitle.textContent = `Candidate Report: ${studentId}`;
-
-        const isPassed = data.overall_status === 'PASSED';
-        const statusBadgeHTML = isPassed ?
-            `<span class="badge badge-passed">PASSED ✅</span>` :
-            `<span class="badge badge-failed">FAILED ❌</span>`;
 
         // Gather evidence frames
         let evidenceFrames = data.evidence_frames || [];
@@ -2241,7 +2316,32 @@ window.inspectCandidate = async function(submissionId) {
             console.warn('Could not fetch candidate evidence:', e);
         }
 
+        // Exclude allowed devices from violation proof frames
+        if (data.phone_allowed) {
+            evidenceFrames = evidenceFrames.filter(f => !f.event_type || !f.event_type.toUpperCase().includes('PHONE'));
+        }
+        if (data.laptop_allowed) {
+            evidenceFrames = evidenceFrames.filter(f => !f.event_type || (!f.event_type.toUpperCase().includes('LAPTOP') && !f.event_type.toUpperCase().includes('DEVICE')));
+        }
+        if (data.person_allowed) {
+            evidenceFrames = evidenceFrames.filter(f => !f.event_type || !f.event_type.toUpperCase().includes('MULTIPLE'));
+        }
+
         window._drawerEvidenceFrames = evidenceFrames;
+
+        // If there are unexempted / prohibited violation proof frames, candidate is FAILED
+        const hasViolations = evidenceFrames.length > 0 ||
+            (!data.phone_allowed && ((data.phone_duration_seconds || 0) > 0)) ||
+            (!data.laptop_allowed && ((data.device_duration_seconds || 0) > 0)) ||
+            (!data.person_allowed && ((data.multiple_persons_duration_seconds || 0) > 0)) ||
+            ((data.missing_duration_seconds || 0) > 5.0) ||
+            data.overall_status === 'FAILED';
+
+        const effectiveStatus = hasViolations ? 'FAILED' : 'PASSED';
+        const isPassed = effectiveStatus === 'PASSED';
+        const statusBadgeHTML = isPassed ?
+            `<span class="badge badge-passed">PASSED ✅</span>` :
+            `<span class="badge badge-failed">FAILED ❌</span>`;
 
         let evidenceGalleryHTML = '';
         if (evidenceFrames.length > 0) {
@@ -2299,6 +2399,32 @@ window.inspectCandidate = async function(submissionId) {
             `;
         }
 
+        const phoneAllowed = data.phone_allowed === true;
+        const phoneDur = Number(data.phone_duration_seconds || 0);
+        const phoneDurHTML = phoneAllowed ?
+            `<span style="color: #4ade80; font-weight: 600;">Permitted by Active Policy ✅</span> (Exempt from Violations)` :
+            (phoneDur > 0 ?
+                `<strong style="color: #ef4444;">${phoneDur.toFixed(1)}s</strong> (VIOLATION ❌ Zero Tolerance)` :
+                `<strong>0.0s</strong> (Clean ✅)`);
+
+        const laptopAllowed = data.laptop_allowed === true;
+        const laptopDur = Number(data.device_duration_seconds || 0);
+        const hasLaptopProof = evidenceFrames.some(f => (f.event_type || '').includes('DEVICE') || (f.event_type || '').includes('LAPTOP'));
+        const laptopDurHTML = laptopAllowed ?
+            `<span style="color: #4ade80; font-weight: 600;">Permitted by Active Policy ✅</span> (Exempt from Violations)` :
+            (laptopDur > 0 || hasLaptopProof ?
+                `<strong style="color: #ef4444;">${laptopDur > 0 ? laptopDur.toFixed(1) + 's' : 'Detected'}</strong> (VIOLATION ❌ Zero Tolerance)` :
+                `<strong>0.0s</strong> (Clean ✅)`);
+
+        const personAllowed = data.person_allowed === true;
+        const personDur = Number(data.multiple_persons_duration_seconds || 0);
+        const hasPersonProof = evidenceFrames.some(f => (f.event_type || '').includes('MULTIPLE') || (f.event_type || '').includes('PERSON'));
+        const personDurHTML = personAllowed ?
+            `<span style="color: #4ade80; font-weight: 600;">Permitted by Active Policy ✅</span> (Exempt from Violations)` :
+            (personDur > 0 || hasPersonProof ?
+                `<strong style="color: #ef4444;">${personDur > 0 ? personDur.toFixed(1) + 's' : 'Detected'}</strong> (VIOLATION ❌ Zero Tolerance)` :
+                `<strong>0.0s</strong> (Clean ✅)`);
+
         drawerBody.innerHTML = `
             <div style="display: flex; flex-direction: column; gap: 12px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -2306,9 +2432,9 @@ window.inspectCandidate = async function(submissionId) {
                     <span style="font-size: 0.8rem; color: #64748b;">Duration: ${data.video_duration_seconds || 0}s</span>
                 </div>
                 <div style="background: #1e293b; padding: 12px; border-radius: 8px; font-size: 0.82rem; display: flex; flex-direction: column; gap: 6px;">
-                    <div>📱 Phone Violation Duration: <strong>${data.phone_duration_seconds || 0}s</strong> (Zero Tolerance)</div>
-                    <div>💻 Secondary Laptop Duration: <strong>${data.device_duration_seconds || 0}s</strong> (Zero Tolerance)</div>
-                    <div>👥 Multi-Person Duration: <strong>${data.multiple_persons_duration_seconds || 0}s</strong> (Zero Tolerance)</div>
+                    <div>📱 Mobile Phone: ${phoneDurHTML}</div>
+                    <div>💻 Secondary Laptop: ${laptopDurHTML}</div>
+                    <div>👥 Room Solitude / Persons: ${personDurHTML}</div>
                     <div>👤 Missing Candidate Duration: <strong>${data.missing_duration_seconds || 0}s</strong></div>
                 </div>
                 ${evidenceGalleryHTML}
@@ -2383,29 +2509,30 @@ function appendChatMessage(sender, text, type = 'bot', timeStr = null) {
 // Global function called when camera scanner detects phone, laptop, or double person
 window.dispatchChatbotCameraWarning = function(data) {
     const now = Date.now();
+    const violations = Array.isArray(data.violations) ? data.violations : [];
 
-    if (data.phone_detected && (now - violationCooldowns.phone > WARNING_COOLDOWN_MS)) {
+    if (data.phone_detected && violations.includes("MOBILE_PHONE_DETECTED") && (now - violationCooldowns.phone > WARNING_COOLDOWN_MS)) {
         violationCooldowns.phone = now;
         const warningMsg = data.warning_chat_message || 
-            "A mobile phone was detected in your camera frame. In accordance with Section 4.2 of the Academic Integrity Code, all cellular devices are strictly prohibited. Please remove the phone immediately.\n\n🛡️ Notice: You have NOT been terminated. This is an official advisory warning.";
+            "A mobile phone was detected in your camera frame. In accordance with active examination integrity policy, cellular devices are strictly prohibited. Please remove the phone immediately.\n\n🛡️ Notice: You have NOT been terminated. This is an official advisory warning.";
         
         showLiveWarningBanner("⚠️ PROCTOR WARNING: Mobile Phone in Workspace", warningMsg);
         appendChatMessage("⚠️ AI Proctor Warning (Mobile Phone)", warningMsg.replace(/\n/g, '<br>'), 'warning');
     }
 
-    if (data.laptop_detected && (now - violationCooldowns.laptop > WARNING_COOLDOWN_MS)) {
+    if (data.laptop_detected && violations.includes("LAPTOP_DETECTED") && (now - violationCooldowns.laptop > WARNING_COOLDOWN_MS)) {
         violationCooldowns.laptop = now;
         const warningMsg = data.warning_chat_message || 
-            "An unauthorized secondary laptop or display was detected in your workspace. Pursuant to Section 4.3, auxiliary computing devices are prohibited. Please close and remove the secondary device.\n\n🛡️ Notice: You have NOT been terminated. Please adjust your workspace.";
+            "An unauthorized secondary laptop or display was detected in your workspace. Pursuant to active examination policy, auxiliary computing devices are prohibited. Please close and remove the secondary device.\n\n🛡️ Notice: You have NOT been terminated. Please adjust your workspace.";
         
         showLiveWarningBanner("⚠️ PROCTOR WARNING: Secondary Laptop Detected", warningMsg);
         appendChatMessage("⚠️ AI Proctor Warning (Secondary Laptop)", warningMsg.replace(/\n/g, '<br>'), 'warning');
     }
 
-    if (data.multiple_persons && (now - violationCooldowns.person > WARNING_COOLDOWN_MS)) {
+    if (data.multiple_persons && violations.includes("MULTIPLE_PERSONS_DETECTED") && (now - violationCooldowns.person > WARNING_COOLDOWN_MS)) {
         violationCooldowns.person = now;
         const warningMsg = data.warning_chat_message || 
-            "Multiple individuals / double person detected in your room. Under Section 5.1, examinations require solitary isolation. Please ensure all secondary individuals exit the room immediately.\n\n🛡️ Notice: You have NOT been terminated. Please restore solitary room isolation.";
+            "Multiple individuals / double person detected in your room. Under active examination policy, solitary isolation is required. Please ensure all secondary individuals exit the room immediately.\n\n🛡️ Notice: You have NOT been terminated. Please restore solitary room isolation.";
         
         showLiveWarningBanner("⚠️ PROCTOR WARNING: Double Person Detected", warningMsg);
         appendChatMessage("⚠️ AI Proctor Warning (Double Person)", warningMsg.replace(/\n/g, '<br>'), 'warning');
@@ -2529,7 +2656,8 @@ async function loadClientCompanies() {
             data.companies.forEach(c => {
                 const opt = document.createElement('option');
                 opt.value = c.id;
-                opt.textContent = `${c.name} (${c.strictness_level})`;
+                const strictStr = c.strictness || c.strictness_level || 'STANDARD';
+                opt.textContent = `${c.name} (${strictStr})`;
                 if (c.id === data.active_company_id) opt.selected = true;
                 adminCompanySelect.appendChild(opt);
             });
@@ -2544,11 +2672,15 @@ async function loadClientCompanies() {
 }
 
 function updateActiveCompanyBanner(company) {
+    if (!company) return;
     if (activeCompanyName) activeCompanyName.textContent = company.name;
-    if (activeCompanyDesc) activeCompanyDesc.textContent = company.description;
+    if (activeCompanyDesc) activeCompanyDesc.textContent = company.description || 'Custom client integrity and examination policies.';
     if (activeCompanyStrictness) {
-        activeCompanyStrictness.textContent = company.strictness_level;
-        if (company.strictness_level === 'MAXIMUM_STRICT') {
+        const sLevel = company.strictness || company.strictness_level || 'STANDARD';
+        activeCompanyStrictness.textContent = sLevel;
+        if (sLevel === 'MAXIMUM_STRICT') {
+            activeCompanyStrictness.className = 'badge badge-failed';
+        } else if (sLevel === 'REGULATORY_CRITICAL') {
             activeCompanyStrictness.className = 'badge badge-failed';
         } else {
             activeCompanyStrictness.className = 'badge badge-warning';
@@ -2567,10 +2699,16 @@ if (adminCompanySelect) {
             });
             if (res.ok) {
                 const data = await res.json();
-                if (data.company) {
-                    updateActiveCompanyBanner(data.company);
+                const activeComp = data.active_company || data.company;
+                if (activeComp) {
+                    updateActiveCompanyBanner(activeComp);
                 }
                 fetchAdminPolicyBreaches();
+                await fetchCandidateSubmissions();
+                const inspectionDrawer = document.getElementById('inspectionDrawer');
+                if (inspectionDrawer && inspectionDrawer.style.display === 'block' && currentInspectedSubmissionId) {
+                    window.inspectCandidate(currentInspectedSubmissionId);
+                }
             }
         } catch (err) {
             console.error('Failed to switch company policy:', err);
@@ -2635,10 +2773,466 @@ async function fetchAdminPolicyBreaches() {
 }
 
 if (refreshAdminEvidenceBtn) {
-    refreshAdminEvidenceBtn.addEventListener('click', fetchAdminPolicyBreaches);
+    refreshAdminEvidenceBtn.addEventListener('click', async () => {
+        refreshAdminEvidenceBtn.disabled = true;
+        refreshAdminEvidenceBtn.innerHTML = '⏳ Refreshing Dossier...';
+        await fetchAdminPolicyBreaches();
+        refreshAdminEvidenceBtn.innerHTML = '✅ Refreshed!';
+        setTimeout(() => {
+            refreshAdminEvidenceBtn.innerHTML = '🔄 Refresh Dossier';
+            refreshAdminEvidenceBtn.disabled = false;
+        }, 800);
+    });
+}
+
+// ==============================================================================
+// Admin Policy Document Ingestion & Breach Definition Studio
+// ==============================================================================
+const policyCompanyName = document.getElementById('policyCompanyName');
+const policyIndustry = document.getElementById('policyIndustry');
+const policyStrictness = document.getElementById('policyStrictness');
+const policyDocFileInput = document.getElementById('policyDocFileInput');
+const policyDocText = document.getElementById('policyDocText');
+const btnIngestPolicyDoc = document.getElementById('btnIngestPolicyDoc');
+const ingestStatusMsg = document.getElementById('ingestStatusMsg');
+
+const chkAllowPhone = document.getElementById('chkAllowPhone');
+const chkAllowLaptop = document.getElementById('chkAllowLaptop');
+const chkAllowPerson = document.getElementById('chkAllowPerson');
+
+const definedBreachRulesContainer = document.getElementById('definedBreachRulesContainer');
+const definedCompanyNameBadge = document.getElementById('definedCompanyNameBadge');
+const definedStrictnessBadge = document.getElementById('definedStrictnessBadge');
+const definedDocSummary = document.getElementById('definedDocSummary');
+const definedBreachCardsGrid = document.getElementById('definedBreachCardsGrid');
+
+const btnTemplateTech = document.getElementById('btnTemplateTech');
+const btnTemplateAllowMobile = document.getElementById('btnTemplateAllowMobile');
+const btnTemplateFintech = document.getElementById('btnTemplateFintech');
+const btnTemplateUniversity = document.getElementById('btnTemplateUniversity');
+
+const btnAutoParsePolicy = document.getElementById('btnAutoParsePolicy');
+const autoParseHint = document.getElementById('autoParseHint');
+
+let uploadedPolicyFileB64 = null;
+let uploadedPolicyFilename = null;
+
+// Comprehensive Natural Language Policy Permission Parser
+function parsePolicyTextClient(text) {
+    if (!text || !text.trim()) {
+        return { phone_allowed: false, laptop_allowed: false, person_allowed: false };
+    }
+    const t = text.toLowerCase();
+    
+    const phoneTerms = ["mobile", "phone", "cellphone", "cell phone", "smartphone", "cellular"];
+    const laptopTerms = ["laptop", "screen", "monitor", "dual display", "tablet", "ipad", "auxiliary display", "secondary machine", "second computer", "device", "devices"];
+    const personTerms = ["person", "people", "group", "companion", "helper", "double person", "secondary person", "roommate"];
+
+    const containsTerm = (str, terms) => {
+        return terms.some(term => new RegExp("\\b" + term + "s?\\b", "i").test(str));
+    };
+
+    let phoneAllowed = false;
+    let laptopAllowed = false;
+    let personAllowed = false;
+
+    // 1. Exemption segments: "except <items>", "excluding <items>", etc.
+    const exemptMatches = t.matchAll(/(?:except|excluding|apart from|other than|besides|omission of)\s+([^.;\n]+)/gi);
+    for (const m of exemptMatches) {
+        const rawSeg = m[1];
+        const cleanSeg = rawSeg.split(/\b(?:all\s+other|all\s+the\s+other|all|others|everything|the\s+rest|flag\s+them|failed)\b/i)[0];
+        if (containsTerm(cleanSeg, phoneTerms)) phoneAllowed = true;
+        if (containsTerm(cleanSeg, laptopTerms)) laptopAllowed = true;
+        if (containsTerm(cleanSeg, personTerms)) personAllowed = true;
+    }
+
+    // 2. Positive permission phrases
+    phoneTerms.forEach(term => {
+        const allowRegex1 = new RegExp("\\b(allow|allowed|permit|permitted|authorized|exempt|acceptable)\\b[^.\\n;]{0,35}\\b" + term + "\\b", "i");
+        const allowRegex2 = new RegExp("\\b" + term + "\\b[^.\\n;]{0,35}\\b(allowed|permitted|authorized|exempt|acceptable)\\b", "i");
+        const noFlagRegex = new RegExp("(?:don'?t|do not)\\s+(?:flag|penalize|fail)[^.\\n;]{0,35}\\b" + term + "\\b", "i");
+        if (allowRegex1.test(t) || allowRegex2.test(t) || noFlagRegex.test(t)) {
+            const notAllowed1 = new RegExp("\\bnot\\s+(?:allowed|permitted)\\b[^.\\n;]{0,35}\\b" + term + "\\b", "i");
+            const notAllowed2 = new RegExp("\\b" + term + "\\b[^.\\n;]{0,35}\\bnot\\s+(?:allowed|permitted)\\b", "i");
+            if (!notAllowed1.test(t) && !notAllowed2.test(t)) {
+                phoneAllowed = true;
+            }
+        }
+    });
+
+    ["laptop", "screen", "monitor", "dual display", "tablet", "auxiliary"].forEach(term => {
+        const allowRegex1 = new RegExp("\\b(allow|allowed|permit|permitted|authorized|exempt|acceptable)\\b[^.\\n;]{0,35}\\b" + term + "\\b", "i");
+        const allowRegex2 = new RegExp("\\b" + term + "\\b[^.\\n;]{0,35}\\b(allowed|permitted|authorized|exempt|acceptable)\\b", "i");
+        const noFlagRegex = new RegExp("(?:don'?t|do not)\\s+(?:flag|penalize|fail)[^.\\n;]{0,35}\\b" + term + "\\b", "i");
+        if (allowRegex1.test(t) || allowRegex2.test(t) || noFlagRegex.test(t)) {
+            const notAllowed1 = new RegExp("\\bnot\\s+(?:allowed|permitted)\\b[^.\\n;]{0,35}\\b" + term + "\\b", "i");
+            const notAllowed2 = new RegExp("\\b" + term + "\\b[^.\\n;]{0,35}\\bnot\\s+(?:allowed|permitted)\\b", "i");
+            if (!notAllowed1.test(t) && !notAllowed2.test(t)) {
+                laptopAllowed = true;
+            }
+        }
+    });
+
+    personTerms.forEach(term => {
+        const allowRegex1 = new RegExp("\\b(allow|allowed|permit|permitted|authorized|exempt|acceptable)\\b[^.\\n;]{0,35}\\b" + term + "\\b", "i");
+        const allowRegex2 = new RegExp("\\b" + term + "\\b[^.\\n;]{0,35}\\b(allowed|permitted|authorized|exempt|acceptable)\\b", "i");
+        const noFlagRegex = new RegExp("(?:don'?t|do not)\\s+(?:flag|penalize|fail)[^.\\n;]{0,35}\\b" + term + "\\b", "i");
+        if (allowRegex1.test(t) || allowRegex2.test(t) || noFlagRegex.test(t)) {
+            const notAllowed1 = new RegExp("\\bnot\\s+(?:allowed|permitted)\\b[^.\\n;]{0,35}\\b" + term + "\\b", "i");
+            const notAllowed2 = new RegExp("\\b" + term + "\\b[^.\\n;]{0,35}\\bnot\\s+(?:allowed|permitted)\\b", "i");
+            if (!notAllowed1.test(t) && !notAllowed2.test(t)) {
+                personAllowed = true;
+            }
+        }
+    });
+
+    // 3. Explicit prohibition override if not in exemption
+    let exemptTexts = "";
+    for (const m of t.matchAll(/(?:except|excluding|apart from|other than|besides|omission of)\s+([^.;\n]+)/gi)) {
+        exemptTexts += " " + m[1];
+    }
+
+    if (new RegExp("\\b(strictly\\s+prohibit|prohibited|banned|forbidden|zero\\s*tolerance)\\b[^.\\n;]{0,35}\\b(phone|mobile)\\b", "i").test(t) ||
+        new RegExp("\\b(phone|mobile)\\b[^.\\n;]{0,35}\\b(strictly\\s+prohibit|prohibited|banned|forbidden)\\b", "i").test(t)) {
+        if (!containsTerm(exemptTexts, phoneTerms)) {
+            phoneAllowed = false;
+        }
+    }
+
+    if (new RegExp("\\b(strictly\\s+prohibit|prohibited|banned|forbidden|zero\\s*tolerance)\\b[^.\\n;]{0,35}\\blaptop\\b", "i").test(t) ||
+        new RegExp("\\blaptop\\b[^.\\n;]{0,35}\\b(strictly\\s+prohibit|prohibited|banned|forbidden)\\b", "i").test(t)) {
+        if (!containsTerm(exemptTexts, laptopTerms)) {
+            laptopAllowed = false;
+        }
+    }
+
+    if (new RegExp("\\b(strictly\\s+prohibit|prohibited|banned|forbidden|zero\\s*tolerance|solitary|isolation)\\b[^.\\n;]{0,35}\\b(person|people)\\b", "i").test(t)) {
+        if (!containsTerm(exemptTexts, personTerms)) {
+            personAllowed = false;
+        }
+    }
+
+    return {
+        phone_allowed: phoneAllowed,
+        laptop_allowed: laptopAllowed,
+        person_allowed: personAllowed
+    };
+}
+
+function syncPolicyPermissionsFromText(showFeedback = false) {
+    if (!policyDocText) return;
+    const text = policyDocText.value || '';
+    const parsed = parsePolicyTextClient(text);
+    const hint = document.getElementById('autoParseHint');
+
+    if (chkAllowPhone) chkAllowPhone.checked = parsed.phone_allowed;
+    if (chkAllowLaptop) chkAllowLaptop.checked = parsed.laptop_allowed;
+    if (chkAllowPerson) chkAllowPerson.checked = parsed.person_allowed;
+
+    if (hint) {
+        if (parsed.phone_allowed || parsed.laptop_allowed || parsed.person_allowed) {
+            hint.style.display = 'inline';
+            const allowed = [];
+            if (parsed.phone_allowed) allowed.push('📱 Phone');
+            if (parsed.laptop_allowed) allowed.push('💻 Laptop');
+            if (parsed.person_allowed) allowed.push('👥 Person');
+            hint.textContent = `✨ Auto-detected: ${allowed.join(', ')} Allowed`;
+            hint.style.color = '#4ade80';
+            hint.style.background = 'rgba(34, 197, 94, 0.12)';
+            hint.style.border = '1px solid rgba(34, 197, 94, 0.3)';
+        } else if (text.trim().length > 10) {
+            hint.style.display = 'inline';
+            hint.textContent = '🔒 Strict Zero-Tolerance: All devices & visitors prohibited';
+            hint.style.color = '#cbd5e1';
+            hint.style.background = 'rgba(148, 163, 184, 0.12)';
+            hint.style.border = '1px solid rgba(148, 163, 184, 0.25)';
+        } else {
+            hint.style.display = 'none';
+        }
+    }
+
+    if (showFeedback) {
+        const allowedList = [];
+        if (parsed.phone_allowed) allowedList.push('📱 Mobile Phones');
+        if (parsed.laptop_allowed) allowedList.push('💻 Secondary Laptops');
+        if (parsed.person_allowed) allowedList.push('👥 Secondary Persons');
+        const summary = allowedList.length > 0 
+            ? `Allowed (Exempt from breach): ${allowedList.join(', ')}` 
+            : `Zero Tolerance: All unauthorized devices & secondary persons are strictly PROHIBITED.`;
+        alert(`🤖 Auto Policy Parser:\n\n${summary}\n\nDevice permissions have been synchronized!`);
+    }
+}
+
+// Dynamic text detection on typing, pasting, or change
+if (policyDocText) {
+    policyDocText.addEventListener('input', () => syncPolicyPermissionsFromText(false));
+    policyDocText.addEventListener('paste', () => setTimeout(() => syncPolicyPermissionsFromText(false), 50));
+    policyDocText.addEventListener('change', () => syncPolicyPermissionsFromText(false));
+}
+
+if (btnAutoParsePolicy) {
+    btnAutoParsePolicy.addEventListener('click', () => syncPolicyPermissionsFromText(true));
+}
+
+// Sample Templates
+if (btnTemplateTech) {
+    btnTemplateTech.addEventListener('click', () => {
+        if (policyCompanyName) policyCompanyName.value = "TechCorp Global Assessment";
+        if (policyIndustry) policyIndustry.value = "Software & Cloud Engineering";
+        if (policyStrictness) policyStrictness.value = "MAXIMUM_STRICT";
+        if (chkAllowPhone) chkAllowPhone.checked = false;
+        if (chkAllowLaptop) chkAllowLaptop.checked = false;
+        if (chkAllowPerson) chkAllowPerson.checked = false;
+        if (policyDocText) {
+            policyDocText.value = 
+`TECHCORP GLOBAL INTEGRITY & PROCTORING CHARTER (2026)
+
+Section 1.0: Scope & Workstation Environment
+All candidates undergoing technical evaluation must maintain an authorized single-machine setup.
+
+Section 4.2: Mobile Phone & Telecommunication Ban
+Cellular smartphones, iPhones, and wearable communication hardware are strictly prohibited from the test room. Possession or viewing of any phone triggers immediate incident logging for proctor audit.
+
+Section 4.3: Secondary Laptop & Auxiliary Display Prohibition
+Only the primary verified candidate laptop is authorized. External screens, dual displays, auxiliary iPads, or secondary computers are prohibited to eliminate unauthorized IDE sharing.
+
+Section 5.1: Candidate Room Solitude & Physical Isolation
+Examinations must be completed alone in solitary confinement. Observers, colleagues, family members, or secondary occupants entering camera visibility are considered an unauthorized intrusion.`;
+        }
+    });
+}
+
+if (btnTemplateAllowMobile) {
+    btnTemplateAllowMobile.addEventListener('click', () => {
+        if (policyCompanyName) policyCompanyName.value = "Acme Mobile-Permitted Assessment";
+        if (policyIndustry) policyIndustry.value = "Software & Remote Engineering";
+        if (policyStrictness) policyStrictness.value = "MEDIUM";
+        if (chkAllowPhone) chkAllowPhone.checked = true;
+        if (chkAllowLaptop) chkAllowLaptop.checked = false;
+        if (chkAllowPerson) chkAllowPerson.checked = false;
+        if (policyDocText) {
+            policyDocText.value = 
+`ACME CORPORATION REMOTE ASSESSMENT CODE & GADGET POLICY (2026)
+
+Section 1.1: Permitted Mobile Devices & 2FA Transceivers
+Mobile phones and cellular devices are explicitly permitted in the workstation for two-factor authentication (2FA), hotspot tethering, and approved calculation. The candidate may possess and access their mobile phone without penalty. Except mobile phones, other communication hardware is regulated.
+
+Section 4.3: Secondary Laptop & Auxiliary Display Prohibition
+Secondary laptops, auxiliary iPads, dual monitors, or external screens are strictly prohibited. The candidate must work solely on their primary evaluation screen.
+
+Section 5.1: Solitary Physical Presence Required
+The examination workspace must have only one candidate. Secondary individuals, observers, or helpers entering the camera view are strictly prohibited.`;
+        }
+    });
+}
+
+if (btnTemplateFintech) {
+    btnTemplateFintech.addEventListener('click', () => {
+        if (policyCompanyName) policyCompanyName.value = "Apex Financial & Banking Certification";
+        if (policyIndustry) policyIndustry.value = "Banking & Financial Services";
+        if (policyStrictness) policyStrictness.value = "REGULATORY_CRITICAL";
+        if (chkAllowPhone) chkAllowPhone.checked = false;
+        if (chkAllowLaptop) chkAllowLaptop.checked = false;
+        if (chkAllowPerson) chkAllowPerson.checked = false;
+        if (policyDocText) {
+            policyDocText.value = 
+`APEX FINANCIAL & BANKING REGULATORY COMPLIANCE DIRECTIVE
+
+Article 2.1: Physical Solitary Requirement
+Due to statutory financial compliance requirements, third-party intrusion is forbidden. Candidates must remain isolated with zero secondary individuals present.
+
+Article 3.4: Prohibited Cellular Transceivers
+Any mobile telephone or electronic transceiver detected in the candidate's workspace constitutes a Tier-1 compliance breach. Digital evidence keyframes are recorded for compliance officer review.
+
+Article 5.8: Auxiliary Processing Units
+Auxiliary laptops, external portable monitors, and secondary machines are banned from the testing surface.`;
+        }
+    });
+}
+
+if (btnTemplateUniversity) {
+    btnTemplateUniversity.addEventListener('click', () => {
+        if (policyCompanyName) policyCompanyName.value = "National University Examination Board";
+        if (policyIndustry) policyIndustry.value = "General Academic & University";
+        if (policyStrictness) policyStrictness.value = "HIGH";
+        if (chkAllowPhone) chkAllowPhone.checked = false;
+        if (chkAllowLaptop) chkAllowLaptop.checked = false;
+        if (chkAllowPerson) chkAllowPerson.checked = false;
+        if (policyDocText) {
+            policyDocText.value = 
+`UNIVERSITY EXAMINATION BYLAWS & ETHICAL CONDUCT CODE
+
+Rule 3.1: Examination Room Decorum
+Candidates must sit for examinations in quiet room isolation without companions or assistants.
+
+Rule 4.2: Cellular Phone Restriction
+Mobile phones must be powered off and kept out of arm's reach. Viewing or touching a phone is a violation of academic integrity.
+
+Rule 4.5: Secondary Computing Equipment
+Only one computing terminal is permitted per examinee. Secondary laptops and tablets are prohibited.`;
+        }
+    });
+}
+
+// File Reader
+if (policyDocFileInput) {
+    policyDocFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        uploadedPolicyFilename = file.name;
+
+        const reader = new FileReader();
+        if (file.type.includes('text') || file.name.endsWith('.txt') || file.name.endsWith('.md') || file.name.endsWith('.json')) {
+            reader.onload = (ev) => {
+                if (policyDocText) {
+                    policyDocText.value = ev.target.result;
+                    policyDocText.dispatchEvent(new Event('input'));
+                }
+            };
+            reader.readAsText(file);
+        } else {
+            reader.onload = (ev) => {
+                uploadedPolicyFileB64 = ev.target.result;
+                if (policyDocText && !policyDocText.value) {
+                    policyDocText.value = `[Uploaded Binary/PDF Document: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]`;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+// Ingest Policy Action
+if (btnIngestPolicyDoc) {
+    btnIngestPolicyDoc.addEventListener('click', async () => {
+        const compName = (policyCompanyName.value || '').trim();
+        const industry = policyIndustry ? policyIndustry.value : 'Technology';
+        const strictness = policyStrictness ? policyStrictness.value : 'HIGH';
+        const textContent = (policyDocText ? policyDocText.value : '').trim();
+
+        if (!compName) {
+            alert('Please enter a Company / Client Name.');
+            if (policyCompanyName) policyCompanyName.focus();
+            return;
+        }
+
+        if (!textContent && !uploadedPolicyFileB64) {
+            alert('Please enter policy document text or upload a policy document file.');
+            if (policyDocText) policyDocText.focus();
+            return;
+        }
+
+        try {
+            btnIngestPolicyDoc.disabled = true;
+            btnIngestPolicyDoc.innerHTML = '⏳ Ingesting & Analyzing Policy...';
+            if (ingestStatusMsg) {
+                ingestStatusMsg.style.display = 'block';
+                ingestStatusMsg.textContent = 'Parsing clauses & defining breach rules with RAG agent...';
+            }
+
+            const res = await fetch('/api/v1/policies/ingest-document', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    company_name: compName,
+                    industry: industry,
+                    strictness: strictness,
+                    document_text: textContent,
+                    document_filename: uploadedPolicyFilename,
+                    file_b64: uploadedPolicyFileB64,
+                    phone_allowed: chkAllowPhone ? chkAllowPhone.checked : false,
+                    laptop_allowed: chkAllowLaptop ? chkAllowLaptop.checked : false,
+                    person_allowed: chkAllowPerson ? chkAllowPerson.checked : false
+                })
+            });
+
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.detail || `Server error (${res.status})`);
+            }
+
+            const data = await res.json();
+
+            // Display Defined Breach Rules
+            if (definedBreachRulesContainer) {
+                definedBreachRulesContainer.style.display = 'block';
+                if (definedCompanyNameBadge) definedCompanyNameBadge.textContent = data.company_name;
+                if (definedStrictnessBadge) definedStrictnessBadge.textContent = data.strictness;
+                if (definedDocSummary) definedDocSummary.textContent = data.document_summary;
+
+                if (definedBreachCardsGrid && data.defined_breaches) {
+                    const iconMap = {
+                        PHONE: '📱',
+                        LAPTOP: '💻',
+                        PERSON: '👥'
+                    };
+                    definedBreachCardsGrid.innerHTML = Object.entries(data.defined_breaches).map(([bType, bInfo]) => {
+                        const isAllowed = bInfo.allowed === true;
+                        const cardBorder = isAllowed ? 'border: 1px solid #22c55e;' : 'border: 1px solid #334155;';
+                        const badgeStyle = isAllowed ? 'background: #22c55e; color: #0f172a;' : (bInfo.severity === 'CRITICAL' ? 'background: #ef4444; color: #fff;' : 'background: #f59e0b; color: #0f172a;');
+                        const statusLabel = isAllowed ? '✅ ALLOWED (NO BREACH)' : `⚠️ ${bInfo.severity}`;
+                        const actionIcon = isAllowed ? '✅ Allowed:' : '🛡️ Admin:';
+                        return `
+                        <div style="background: #0f172a; ${cardBorder} border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                    <strong style="color: ${isAllowed ? '#4ade80' : '#38bdf8'}; font-size: 0.85rem;">
+                                        ${iconMap[bType] || '⚠️'} ${bType.replace('_', ' ')}
+                                    </strong>
+                                    <span class="badge" style="${badgeStyle} font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;">
+                                        ${statusLabel}
+                                    </span>
+                                </div>
+                                <div style="font-size: 0.76rem; color: #a5f3fc; font-weight: 600; margin-bottom: 4px;">
+                                    📜 ${bInfo.clause}
+                                </div>
+                                <div style="font-size: 0.74rem; color: #cbd5e1; line-height: 1.4; margin-bottom: 8px;">
+                                    ${bInfo.rule}
+                                </div>
+                            </div>
+                            <div style="font-size: 0.7rem; color: ${isAllowed ? '#4ade80' : '#f59e0b'}; background: ${isAllowed ? 'rgba(34, 197, 94, 0.1)' : 'rgba(245, 158, 11, 0.08)'}; padding: 4px 6px; border-radius: 4px;">
+                                ${actionIcon} ${bInfo.admin_action}
+                            </div>
+                        </div>
+                    `}).join('');
+                }
+            }
+
+            // Sync checkboxes to definitive evaluated breach permissions
+            if (data.defined_breaches) {
+                if (chkAllowPhone && data.defined_breaches.PHONE) chkAllowPhone.checked = !!data.defined_breaches.PHONE.allowed;
+                if (chkAllowLaptop && data.defined_breaches.LAPTOP) chkAllowLaptop.checked = !!data.defined_breaches.LAPTOP.allowed;
+                if (chkAllowPerson && data.defined_breaches.PERSON) chkAllowPerson.checked = !!data.defined_breaches.PERSON.allowed;
+            }
+
+            if (ingestStatusMsg) {
+                ingestStatusMsg.textContent = `✅ ${data.message}`;
+            }
+
+            // Reload company dropdown, evidence dossier & candidate directory under active company
+            await loadClientCompanies();
+            await fetchAdminPolicyBreaches();
+            await fetchCandidateSubmissions();
+            const inspectionDrawer = document.getElementById('inspectionDrawer');
+            if (inspectionDrawer && inspectionDrawer.style.display === 'block' && currentInspectedSubmissionId) {
+                window.inspectCandidate(currentInspectedSubmissionId);
+            }
+
+        } catch (err) {
+            console.error('Policy Ingestion failed:', err);
+            alert('Failed ingesting policy document: ' + err.message);
+            if (ingestStatusMsg) {
+                ingestStatusMsg.textContent = `❌ ${err.message}`;
+            }
+        } finally {
+            btnIngestPolicyDoc.disabled = false;
+            btnIngestPolicyDoc.innerHTML = '⚡ Ingest Policy Document & Define Breach Rules ➔';
+        }
+    });
 }
 
 // Initial load of client companies
 loadClientCompanies();
+
 
 

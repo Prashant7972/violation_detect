@@ -1,0 +1,56 @@
+{
+  "institution_id": "GLOBAL_DEFAULT",
+  "exam_id": "STANDARD_PROCTORING_POLICY",
+  "version": "1.0.0",
+  "rules": {
+    "ALLOWED_OBJECTS": [
+      "eyeglasses",
+      "glasses",
+      "water_bottle",
+      "clear_bottle",
+      "blank_scratch_paper",
+      "pen",
+      "pencil"
+    ],
+    "STRICTLY_PROHIBITED": [
+      "smartphone",
+      "mobile_phone",
+      "cell_phone",
+      "phone",
+      "secondary_screen",
+      "laptop",
+      "monitor",
+      "display",
+      "tablet",
+      "ipad",
+      "earbud",
+      "earbuds",
+      "airpods",
+      "headphones",
+      "headset",
+      "smartwatch",
+      "apple_watch",
+      "book",
+      "textbook",
+      "notes",
+      "cheat_sheet"
+    ],
+    "MAX_OFFSCREEN_GAZE_TOLERANCE_SECONDS": 5.0,
+    "AUDIO_RESTRICTION_LEVEL": "STRICT",
+    "SEVERITY_MAPPINGS": {
+      "PROHIBITED_DEVICE": "CRITICAL",
+      "MULTIPLE_FACES_DETECTED": "HIGH",
+      "NO_FACE_DETECTED": "HIGH",
+      "DICTATION_OR_COLLUSION_DETECTED": "HIGH",
+      "MULTIPLE_VOICES_DETECTED": "HIGH",
+      "SUSPICIOUS_GAZE": "MEDIUM",
+      "WHISPERING_DETECTED": "MEDIUM"
+    },
+    "RISK_POINTS": {
+      "CRITICAL": 35.0,
+      "HIGH": 25.0,
+      "MEDIUM": 12.0,
+      "LOW": 5.0
+    }
+  }
+}

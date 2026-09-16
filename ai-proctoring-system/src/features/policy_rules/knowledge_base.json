@@ -1,0 +1,88 @@
+{
+  "version": "1.0.0",
+  "institution": "Standard AI Proctoring Examination Board",
+  "articles": [
+    {
+      "id": "DOC-001",
+      "category": "DOCUMENTATION_AND_ID",
+      "title": "Acceptable Government Identification Documents",
+      "keywords": ["id", "identification", "passport", "driver license", "pan card", "voter id", "national id", "aadhaar", "document", "documents", "valid id"],
+      "content": "Candidates must present an original, unexpired, government-issued photo ID prior to starting the examination. Acceptable identification documents include: 1) Valid International Passport, 2) Official Driver's License, 3) National Identity Card / Citizen ID, 4) Permanent Account Number (PAN) Card, 5) Voter Identification Card, 6) Institutional Student ID Card (if pre-authorized). Digital copies, screenshots, expired cards, or photocopies are strictly prohibited.",
+      "citation": "Exam Regulation Section 1.1 (Candidate Identification Standards)"
+    },
+    {
+      "id": "DOC-002",
+      "category": "DOCUMENTATION_AND_ID",
+      "title": "Biometric Verification & Face Matching Guidelines",
+      "keywords": ["biometric", "selfie", "face match", "arcface", "photo", "camera", "verification", "lighting", "face"],
+      "content": "Before taking the test, candidates undergo an automated ArcFace 512-dimensional biometric comparison between their photo ID and a live webcam selfie. Ensure: 1) Face is squarely centered, looking directly into the camera, 2) Good ambient lighting without backlight or heavy shadows, 3) Removal of hats, sunglasses, or face coverings (religious headwear is permitted if the face from forehead to chin is fully visible). A similarity match of >= 70% grants immediate automated clearance. Matches between 40% and 69.9% are forwarded to a human proctor review corridor to prevent false disqualifications.",
+      "citation": "Biometric Compliance Policy Section 2.3"
+    },
+    {
+      "id": "RULE-001",
+      "category": "PROHIBITED_ITEMS",
+      "title": "Strictly Prohibited Electronic Hardware & Communication Devices",
+      "keywords": ["prohibited", "phone", "smartphone", "mobile", "cellphone", "ipad", "tablet", "watch", "smartwatch", "apple watch", "headphones", "earbuds", "airpods", "headset", "secondary screen", "monitor", "electronics", "devices"],
+      "content": "All unauthorized electronic communication hardware is strictly prohibited in the exam workspace. This includes: Smartphones, cellular phones, tablets, iPads, smartwatches, fitness bands, wireless earbuds, AirPods, headphones, headsets, Bluetooth devices, and secondary monitors. Any detection of these devices by the vision intelligence engine or multi-angle cameras constitutes an immediate CRITICAL violation (35 penalty points) and will be escalated to the proctor.",
+      "citation": "Academic Integrity Code Section 4.2 (Hardware Restrictions)"
+    },
+    {
+      "id": "RULE-002",
+      "category": "PERMITTED_ITEMS",
+      "title": "Authorized Desk Items and Permitted Materials",
+      "keywords": ["allowed", "permitted", "water", "water bottle", "scratch paper", "paper", "pen", "pencil", "glasses", "eyeglasses", "desk"],
+      "content": "Candidates are permitted to keep the following items on their test desk: 1) Prescription eyeglasses with clear transparent lenses (smart glasses are prohibited), 2) A clear, transparent water bottle without paper labels, 3) Up to two sheets of completely blank scratch paper (must be held up and shown to the camera before exam start), 4) A standard blue or black ink pen or wooden pencil. All other items, bags, wallets, and food must be removed.",
+      "citation": "Workspace Preparation Protocol Section 3.1"
+    },
+    {
+      "id": "RULE-003",
+      "category": "EXAM_CONDUCT",
+      "title": "Workspace Isolation & Presence of Other Persons",
+      "keywords": ["room", "person", "persons", "multiple people", "intruder", "talking", "collusion", "family", "friend", "someone"],
+      "content": "Candidates must test alone in a private, quiet room with closed doors. Zero unauthorized persons may be present or enter the room during the test. If a secondary face is detected in the video stream, the system flags a MULTIPLE_FACES_DETECTED violation (25 penalty points). If somebody unexpectedly enters, instruct them to leave immediately without breaking eye contact with the screen, and notify the proctor via chat.",
+      "citation": "Candidate Conduct Policy Section 5.1 (Room Isolation)"
+    },
+    {
+      "id": "RULE-004",
+      "category": "EXAM_CONDUCT",
+      "title": "Gaze Direction, Screen Focus & Face Absence",
+      "keywords": ["gaze", "looking away", "eye", "eyes", "face away", "leave", "absence", "bathroom", "restroom", "break"],
+      "content": "Candidates must maintain forward gaze towards the primary monitor throughout the assessment. Looking off-screen towards drawers, walls, or below the desk for more than 5 consecutive seconds triggers a SUSPICIOUS_GAZE alert. Leaving the webcam frame is recorded as NO_FACE_DETECTED. Unscheduled bathroom breaks are not permitted unless your exam specifically provides an official intermission or you obtain prior sign-off from your assigned proctor.",
+      "citation": "Candidate Conduct Policy Section 5.4 (Attention Monitoring)"
+    },
+    {
+      "id": "RULE-005",
+      "category": "AUDIO_POLICIES",
+      "title": "Audio Restrictions, Whispering, and Dictation Collusion",
+      "keywords": ["audio", "sound", "speaking", "talking", "whisper", "whispering", "dictation", "mic", "microphone", "noise", "read aloud"],
+      "content": "The exam environment must remain completely quiet. Reading test questions aloud, whispering, murmuring, or speaking to anyone is prohibited and triggers acoustic collusion screening (DICTATION_OR_COLLUSION_DETECTED or WHISPERING_DETECTED). Background noise such as television or loud music should be turned off before starting.",
+      "citation": "Acoustic Integrity Protocol Section 6.2"
+    },
+    {
+      "id": "ENV-001",
+      "category": "DEVICE_AND_ENVIRONMENT",
+      "title": "Camera Setup, Lighting, and Secondary Mobile Angle",
+      "keywords": ["webcam", "camera", "secondary camera", "mobile camera", "phone camera", "dual camera", "qr", "angle", "position", "setup"],
+      "content": "Place your primary laptop or desktop webcam centered at eye level so your head, shoulders, and background are clearly framed. If your institution mandates multi-angle proctoring, you can pair your mobile smartphone as a secondary camera via the QR code. Position the secondary phone at a 45-degree angle approximately 3 to 4 feet to your side, capturing your keyboard, hands, and desk surface. Ensure room lighting is bright and evenly distributed.",
+      "citation": "Technical Setup Standard Section 2.1"
+    },
+    {
+      "id": "POL-001",
+      "category": "GRADING_AND_ESCALATION",
+      "title": "Cumulative Risk Scoring, Warnings, and Human Proctor Safeguards",
+      "keywords": ["risk score", "score", "warning", "terminate", "escalate", "points", "disqualification", "proctor action", "penalty"],
+      "content": "The system computes a real-time cumulative risk score from 0.0 to 100.0: 1) Score < 40: Normal status (CONTINUE), 2) Score 40 - 69.9: Official Warning issued to candidate (WARN), 3) Score 70 - 89.9: Flagged for live human proctor triage (ESCALATE_HUMAN), 4) Score >= 90: Potential termination (TERMINATE). Important: Automated AI models NEVER autonomously disqualify or terminate an exam; any severe action requires verified human proctor review.",
+      "citation": "Proctoring Governance Policy Section 7.0 (Human Oversight)"
+    }
+  ],
+  "suggested_questions": [
+    "What photo IDs and documentation are accepted?",
+    "What items are strictly prohibited during the exam?",
+    "Can I have water or blank scratch paper on my desk?",
+    "Can I wear headphones, earbuds, or a smartwatch?",
+    "Are bathroom breaks allowed during the test?",
+    "What happens if someone enters my room or makes noise?",
+    "How does the secondary mobile camera angle work?",
+    "How does the risk scoring and warning system work?"
+  ]
+}

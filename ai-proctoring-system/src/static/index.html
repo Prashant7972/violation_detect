@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Remote Proctoring System | LangGraph + Gemini 2.5 Flash</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Top Navigation Bar -->
+        <header class="navbar">
+            <div class="brand">
+                <div class="brand-logo">🛡️</div>
+                <div class="brand-info">
+                    <h1>AI Remote Proctoring System</h1>
+                    <span class="engine-badge">LangGraph + Gemini 2.5 Flash</span>
+                </div>
+            </div>
+
+            <div class="nav-tabs">
+                <button class="nav-btn active" data-tab="candidate-tab">🎓 Candidate Exam Portal</button>
+                <button class="nav-btn" data-tab="proctor-tab">👁️ Proctor Command Center</button>
+            </div>
+
+            <div class="nav-status">
+                <span class="status-indicator online" id="wsStatusDot"></span>
+                <span class="status-text" id="wsStatusText">Live Feed Active</span>
+                <a href="/docs" target="_blank" class="docs-link" title="Open API Documentation">API Docs ↗</a>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-container">
+
+            <!-- ========================================================= -->
+            <!-- TAB 1: CANDIDATE EXAM PORTAL                             -->
+            <!-- ========================================================= -->
+            <section id="candidate-tab" class="tab-pane active">
+                <!-- Stepper Progress Navigation -->
+                <div class="wizard-stepper-bar">
+                    <div class="wizard-step-node active" id="stepNode1" onclick="goToWizardStep(1)">
+                        <span class="node-num">1</span>
+                        <div class="node-text">
+                            <span class="node-title">Policy & Chatbot</span>
+                            <span class="node-sub">Rules & Documentation</span>
+                        </div>
+                    </div>
+                    <div class="node-divider" id="divider1"></div>
+                    <div class="wizard-step-node" id="stepNode2" onclick="goToWizardStep(2)">
+                        <span class="node-num">2</span>
+                        <div class="node-text">
+                            <span class="node-title">ID & Live Selfie</span>
+                            <span class="node-sub">Mandatory Live Capture</span>
+                        </div>
+                    </div>
+                    <div class="node-divider" id="divider2"></div>
+                    <div class="wizard-step-node" id="stepNode3" onclick="goToWizardStep(3)">
+                        <span class="node-num">3</span>
+                        <div class="node-text">
+                            <span class="node-title">Device Setup</span>
+                            <span class="node-sub">Multi-Angle Cameras</span>
+                        </div>
+                    </div>
+                    <div class="node-divider" id="divider3"></div>
+                    <div class="wizard-step-node" id="stepNode4" onclick="goToWizardStep(4)">
+                        <span class="node-num">4</span>
+                        <div class="node-text">
+                            <span class="node-title">Live Exam Room</span>
+                            <span class="node-sub">Active AI Proctoring</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================================= -->
+                <!-- WIZARD STEP 1: RULES & PRE-EXAM POLICY RAG CHATBOT       -->
+                <!-- ========================================================= -->
+                <div class="wizard-step-pane active" id="wizardPane1">
+                    <div class="card chatbot-card">
+                        <div class="card-header">
+                            <div class="header-with-icon">
+                                <span class="header-icon">🤖</span>
+                                <div>
+                                    <h2>Step 1: Exam Rules & Required Documentation Assistant</h2>
+                                    <span class="engine-badge">RAG Knowledge Engine + Gemini 2.5 Flash</span>
+                                </div>
+                            </div>
+                            <span class="badge badge-purple">Candidate Onboarding</span>
+                        </div>
+                        <p class="section-desc">Ask our AI assistant about acceptable photo IDs, prohibited electronics, permitted desk items, or exam conduct rules before proceeding to identity verification.</p>
+
+                        <!-- Quick Question Suggestion Chips -->
+                        <div class="chat-chips-container">
+                            <span class="chips-label">Frequently Asked Inquiries (Click to Ask):</span>
+                            <div class="chips-list" id="chipsList">
+                                <button class="chip-btn" data-query="What photo IDs and documentation are accepted?">📄 Accepted Photo IDs</button>
+                                <button class="chip-btn" data-query="What items are strictly prohibited during the exam?">🚫 Prohibited Devices</button>
+                                <button class="chip-btn" data-query="Can I have water or blank scratch paper on my desk?">🥤 Permitted Desk Items</button>
+                                <button class="chip-btn" data-query="Can I wear headphones, earbuds, or a smartwatch?">🎧 Headphones & Watches</button>
+                                <button class="chip-btn" data-query="Are bathroom breaks allowed during the test?">🚻 Bathroom Policy</button>
+                                <button class="chip-btn" data-query="How does the secondary mobile camera angle work?">📱 2nd Camera Setup</button>
+                            </div>
+                        </div>
+
+                        <!-- Chat Messages Window -->
+                        <div class="chat-window" id="chatWindow">
+                            <div class="chat-msg assistant">
+                                <div class="msg-avatar">🤖</div>
+                                <div class="msg-bubble">
+                                    <p>Hello! I am your <strong>AI Pre-Exam Guidance Assistant</strong>. Before you proceed to biometric verification, ask me anything regarding acceptable government photo IDs, prohibited items, or camera requirements.</p>
+                                    <div class="msg-meta">Institutional Exam Board Guidance</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Input Bar -->
+                        <div class="chat-input-bar">
+                            <input type="text" id="chatQueryInput" class="chat-input" placeholder="Ask about rules, photo IDs, allowed items, or camera requirements...">
+                            <button class="btn btn-primary" id="sendChatQueryBtn">Ask Policy AI</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 1 Confirmation & Proceed -->
+                    <div class="card wizard-footer-card">
+                        <div class="policy-acknowledgment">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="policyAgreeCheckbox" checked>
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label">I have reviewed and understood the examination rules, prohibited device regulations, and identification standards.</span>
+                            </label>
+                        </div>
+                        <div class="wizard-actions">
+                            <div></div>
+                            <button class="btn btn-primary btn-lg" id="step1ProceedBtn" onclick="goToWizardStep(2)">Proceed to Step 2: ID & Mandatory Live Selfie ➔</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================================= -->
+                <!-- WIZARD STEP 2: ID & MANDATORY LIVE WEBCAM SELFIE         -->
+                <!-- ========================================================= -->
+                <div class="wizard-step-pane" id="wizardPane2" style="display:none;">
+                    <div class="card id-verify-card">
+                        <div class="card-header">
+                            <div class="header-with-icon">
+                                <span class="header-icon">🪪</span>
+                                <div>
+                                    <h2>Step 2: Pre-Exam Biometric Identity Check</h2>
+                                    <span class="sub-badge">ArcFace 512-d Facial Embedding Match with Human-in-the-Loop Tri-State Triage</span>
+                                </div>
+                            </div>
+                            <span class="badge" id="idVerifyBadge">NOT VERIFIED</span>
+                        </div>
+                        <p class="section-desc">Document upload is permitted for your photo ID. However, <strong>the candidate selfie MUST be captured live using your webcam</strong> to guarantee authenticity and prevent photo spoofing.</p>
+
+                        <div class="id-upload-grid">
+                            <!-- Left Slot: Photo ID Document Upload -->
+                            <div class="upload-slot">
+                                <div class="slot-header">
+                                    <label>1. Government Photo ID (Upload Permitted)</label>
+                                    <select id="docTypeSelect" class="doc-select">
+                                        <option value="PASSPORT">Passport</option>
+                                        <option value="DRIVERS_LICENSE">Driver's License</option>
+                                        <option value="NATIONAL_ID">National ID / Citizen Card</option>
+                                        <option value="PAN_CARD">PAN Card</option>
+                                        <option value="VOTER_ID">Voter ID</option>
+                                    </select>
+                                </div>
+                                <div class="preview-box" id="idDocPreview">
+                                    <span class="preview-placeholder">📄 No ID Uploaded Yet</span>
+                                    <img id="idDocImg" style="display:none;" alt="Photo ID">
+                                </div>
+                                <input type="file" id="idDocInput" accept="image/*" class="file-input">
+                                <div class="slot-controls">
+                                    <button class="btn btn-sm btn-outline" onclick="document.getElementById('idDocInput').click()">📁 Choose ID Document File</button>
+                                    <button class="btn btn-sm btn-secondary" id="useSampleDocBtn">Use Sample Test ID</button>
+                                </div>
+                            </div>
+
+                            <!-- Right Slot: MANDATORY LIVE WEBCAM SELFIE (Uploads Disallowed) -->
+                            <div class="upload-slot mandatory-live-slot">
+                                <div class="slot-header">
+                                    <label class="mandatory-label">2. Candidate Selfie <span class="mandatory-badge">🔴 MANDATORY LIVE WEBCAM</span></label>
+                                </div>
+                                <div class="preview-box live-webcam-preview-box" id="selfiePreview">
+                                    <video id="selfieWebcamVideo" autoplay playsinline muted style="display:none; width:100%; height:100%; object-fit:cover;"></video>
+                                    <canvas id="selfieCanvas" style="display:none;"></canvas>
+                                    <span class="preview-placeholder" id="selfiePlaceholder">📷 Start Camera & Snap Live Selfie</span>
+                                    <img id="selfieImg" style="display:none;" alt="Captured Live Selfie">
+                                </div>
+                                <!-- No file upload input here! Enforcing live capture -->
+                                <div class="slot-controls">
+                                    <button class="btn btn-sm btn-primary" id="startSelfieCamBtn">📹 1. Start Webcam</button>
+                                    <button class="btn btn-sm btn-success" id="snapSelfieBtn" disabled>📸 2. Snap Live Selfie</button>
+                                    <button class="btn btn-sm btn-outline" id="retakeSelfieBtn" style="display:none;">🔄 Retake</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Verification Trigger & Result Bar -->
+                        <div class="id-actions">
+                            <button class="btn btn-primary btn-lg" id="runBiometricVerifyBtn">Verify Biometric Identity</button>
+                            <div class="similarity-meter" id="simMeterContainer" style="display:none;">
+                                <span class="sim-label">ArcFace Similarity Match: <strong id="simPercentage">0%</strong></span>
+                                <div class="meter-bar"><div class="meter-fill" id="simMeterFill"></div></div>
+                                <p class="sim-reason" id="simReasonText"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 Navigation -->
+                    <div class="card wizard-footer-card">
+                        <div class="wizard-actions">
+                            <button class="btn btn-outline" onclick="goToWizardStep(1)">⮜ Back to Step 1: Policy Chatbot</button>
+                            <button class="btn btn-primary btn-lg" id="step2ProceedBtn" onclick="goToWizardStep(3)" disabled>Proceed to Step 3: Device Diagnostics ➔</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================================= -->
+                <!-- WIZARD STEP 3: DEVICE & MULTI-ANGLE CAMERA DIAGNOSTICS   -->
+                <!-- ========================================================= -->
+                <div class="wizard-step-pane" id="wizardPane3" style="display:none;">
+                    <div class="card camera-card">
+                        <div class="card-header">
+                            <div class="header-with-icon">
+                                <span class="header-icon">⚙️</span>
+                                <div>
+                                    <h2>Step 3: Multi-Angle Hardware & Environment Diagnostics</h2>
+                                    <span class="sub-badge">Primary Laptop Webcam & Secondary Mobile Camera Sync (&le; 1000ms)</span>
+                                </div>
+                            </div>
+                            <span class="badge badge-success">SYNCED &le; 1000ms</span>
+                        </div>
+                        <p class="section-desc">Verify both camera angles and test room illumination before entering the examination environment.</p>
+
+                        <div class="dual-camera-container">
+                            <div class="camera-feed primary-feed">
+                                <div class="feed-header">
+                                    <span>Primary Laptop Webcam (Direct Angle)</span>
+                                    <span class="cam-dot live" id="primaryCamDot"></span>
+                                </div>
+                                <div class="video-wrapper">
+                                    <video id="primaryWebcam" autoplay playsinline muted></video>
+                                    <canvas id="primaryCanvas" style="display:none;"></canvas>
+                                    <div class="feed-overlay" id="primaryOverlay">
+                                        <span class="overlay-tag" id="faceDetectTag">Face: Center</span>
+                                        <span class="overlay-tag" id="gazeTag">Gaze: Forward</span>
+                                    </div>
+                                </div>
+                                <div class="feed-controls">
+                                    <button class="btn btn-sm btn-outline" id="startCamBtn">Start Webcam</button>
+                                    <button class="btn btn-sm btn-outline" id="stopCamBtn">Stop Webcam</button>
+                                </div>
+                            </div>
+
+                            <div class="camera-feed secondary-feed">
+                                <div class="feed-header">
+                                    <span>Secondary Mobile Camera (45° Desk Angle)</span>
+                                    <span class="cam-dot standby" id="secondaryDot"></span>
+                                </div>
+                                <div class="video-wrapper secondary-wrapper" id="secondaryFeedBox">
+                                    <div class="qr-pairing-box">
+                                        <div class="qr-placeholder">📱</div>
+                                        <p>Scan with mobile device to pair desk angle</p>
+                                        <button class="btn btn-xs btn-outline" id="simulateSecondaryBtn">Simulate Secondary Angle</button>
+                                    </div>
+                                    <img id="secondarySimImg" style="display:none;" alt="Secondary Camera">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="diagnostics-checklist mt-4">
+                            <h3>Pre-Exam System Readiness Checklist</h3>
+                            <div class="checklist-grid">
+                                <div class="check-item"><span class="check-icon">✅</span> Face centered & well-lit in primary feed</div>
+                                <div class="check-item"><span class="check-icon">✅</span> Secondary desk angle paired</div>
+                                <div class="check-item"><span class="check-icon">✅</span> Zero unauthorized persons in room</div>
+                                <div class="check-item"><span class="check-icon">✅</span> Cellphones & smartwatches removed from desk</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 Navigation -->
+                    <div class="card wizard-footer-card">
+                        <div class="wizard-actions">
+                            <button class="btn btn-outline" onclick="goToWizardStep(2)">⮜ Back to Step 2: Biometric ID</button>
+                            <button class="btn btn-success btn-lg" id="step3ProceedBtn" onclick="goToWizardStep(4)">Launch Exam & Begin Active Proctoring ➔</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================================= -->
+                <!-- WIZARD STEP 4: LIVE EXAMINATION & ACTIVE PROCTORING ROOM -->
+                <!-- ========================================================= -->
+                <div class="wizard-step-pane" id="wizardPane4" style="display:none;">
+                    <div class="active-exam-banner card">
+                        <div class="exam-hud-left">
+                            <span class="hud-pill live-pill">🔴 ACTIVE EXAM SESSION</span>
+                            <span class="hud-meta">Candidate: <strong id="activeCandidateIdDisplay">CANDIDATE-001</strong></span>
+                            <span class="hud-meta">Session: <code id="activeSessionIdDisplay">sess_demo_live</code></span>
+                        </div>
+                        <div class="exam-hud-right">
+                            <span class="hud-timer">⏱️ Exam In Progress</span>
+                            <button class="btn btn-sm btn-outline" onclick="goToWizardStep(1)">📋 Review Policies</button>
+                        </div>
+                    </div>
+
+                    <!-- Continuous Webcam AI Stream Status Bar -->
+                    <div class="hud-stream-bar card">
+                        <div class="stream-badge-pulse">
+                            <span class="pulse-dot green" id="liveStreamPulse"></span>
+                            <strong id="liveStreamText">Active Real-Time Computer Vision Proctoring: Streaming frames every 2.0s</strong>
+                        </div>
+                        <div class="live-stream-controls">
+                            <span class="badge badge-success" id="streamFpsBadge">1 frame / 2.0s</span>
+                            <button class="btn btn-xs btn-outline" id="toggleAutoStreamBtn">⏸️ Pause Auto-Stream</button>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Canvas for Automated Webcam Frame Sampling -->
+                    <canvas id="activeExamCanvas" width="640" height="480" style="display:none;"></canvas>
+
+                    <!-- Real-Time Candidate Warning Popup Banner -->
+                    <div class="candidate-warning-banner" id="candidateWarningBanner" style="display:none;">
+                        <div class="warning-banner-icon">⚠️</div>
+                        <div class="warning-banner-content">
+                            <strong id="warningBannerTitle">PROCTOR VIOLATION WARNING</strong>
+                            <p id="warningBannerText">Violation detected in exam workspace.</p>
+                        </div>
+                        <button class="btn btn-xs btn-outline-white" id="dismissWarningBannerBtn">Acknowledge Notice</button>
+                    </div>
+
+                    <div class="portal-grid">
+                        <!-- Left: Live Video Proctoring HUD -->
+                        <div class="portal-column">
+                            <div class="card camera-card">
+                                <div class="card-header">
+                                    <h2>Live Examination Video Feeds</h2>
+                                    <span class="badge badge-success">AI AUDIT ACTIVE</span>
+                                </div>
+                                <div class="dual-camera-container">
+                                    <div class="camera-feed">
+                                        <div class="feed-header">
+                                            <span>Primary Webcam View</span>
+                                            <span class="cam-dot live"></span>
+                                        </div>
+                                        <div class="video-wrapper">
+                                            <video id="activeExamVideo" autoplay playsinline muted></video>
+                                            <div class="feed-overlay">
+                                                <span class="overlay-tag">Face: Tracked</span>
+                                                <span class="overlay-tag">Audio: Clear</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="camera-feed">
+                                        <div class="feed-header">
+                                            <span>Secondary Mobile Desk View</span>
+                                            <span class="cam-dot live"></span>
+                                        </div>
+                                        <div class="video-wrapper">
+                                            <img id="activeSecondaryImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='240' viewBox='0 0 320 240'><rect width='320' height='240' fill='%231e293b'/><circle cx='160' cy='120' r='50' fill='%23334155'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='12' font-family='sans-serif'>Secondary 45° View Active</text></svg>" alt="Secondary Desk View" style="width:100%; height:100%; object-fit:cover;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Simulator Testing Controls -->
+                            <div class="card simulator-card">
+                                <div class="card-header">
+                                    <h2>Simulate Multi-Modal Ingestion Events</h2>
+                                    <span class="badge badge-info">Testing Engine</span>
+                                </div>
+                                <p class="section-desc">Submit frames and audio transcripts to trigger LangGraph parallel node evaluation.</p>
+
+                                <div class="sim-actions">
+                                    <button class="btn btn-outline" id="simNormalFrameBtn">🟢 Clean Normal Frame</button>
+                                    <button class="btn btn-warning" id="simGazeDeviationBtn">🟡 Suspicious Gaze (+10 pts)</button>
+                                    <button class="btn btn-warning" id="simWhisperBtn">🎙️ Whispering Audio (+15 pts)</button>
+                                    <button class="btn btn-danger" id="simPhoneDetectedBtn">📱 Prohibited Cellphone (+35 pts)</button>
+                                    <button class="btn btn-danger" id="simMultiPersonBtn">👥 Multiple Persons (+25 pts)</button>
+                                    <button class="btn btn-danger" id="simCollusionBtn">🗣️ Dictation Collusion (+30 pts)</button>
+                                </div>
+
+                                <div class="custom-transcript-group">
+                                    <label>Custom Audio Transcript Injection:</label>
+                                    <div class="input-inline">
+                                        <input type="text" id="customTranscriptInput" placeholder="e.g. 'Hey, what is the answer to question 4?'">
+                                        <button class="btn btn-secondary" id="sendTranscriptBtn">Send Frame</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stored Violation Evidence Frames Gallery -->
+                            <div class="card evidence-gallery-card mt-3" id="candidateEvidenceCard">
+                                <div class="card-header">
+                                    <div class="header-with-icon">
+                                        <span class="header-icon">📸</span>
+                                        <div>
+                                            <h2>Stored Violation Evidence Keyframes</h2>
+                                            <span class="sub-badge">Real-Time Computer Vision Screenshots with Color-Coded Bounding Boxes</span>
+                                        </div>
+                                    </div>
+                                    <span class="badge badge-danger" id="candidateEvidenceCount">0 Keyframes</span>
+                                </div>
+                                <div class="evidence-grid" id="candidateEvidenceGrid">
+                                    <p class="text-muted p-3">No violations detected yet. Workspace is currently clean.</p>
+                                </div>
+                            </div>
+
+                            <!-- Live Proctor Intercom & Instructions -->
+                            <div class="card proctor-intercom-card mt-3" id="candidateIntercomCard">
+                                <div class="card-header">
+                                    <div class="header-with-icon">
+                                        <span class="header-icon">💬</span>
+                                        <div>
+                                            <h2>Live Proctor Intercom & Instructions</h2>
+                                            <span class="sub-badge">Direct Communication & Instant Warning Alerts</span>
+                                        </div>
+                                    </div>
+                                    <span class="badge badge-info" id="candidateMsgCountBadge">1 Message</span>
+                                </div>
+                                <div class="intercom-messages-box" id="candidateMsgBox">
+                                    <div class="intercom-msg proctor">
+                                        <span class="msg-author">👁️ Proctor Command</span>
+                                        <p>Active proctoring enabled. Ensure your camera remains centered and no prohibited devices are in view.</p>
+                                        <span class="msg-time">Exam Commenced</span>
+                                    </div>
+                                </div>
+                                <div class="intercom-input-bar">
+                                    <input type="text" id="candidateReplyInput" class="chat-input" placeholder="Type quick message or inquiry to proctor...">
+                                    <button class="btn btn-secondary btn-sm" id="sendCandidateReplyBtn">Send to Proctor</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Real-time Telemetry & Event Stream -->
+                        <div class="portal-column">
+                            <div class="card telemetry-card">
+                                <div class="card-header">
+                                    <h2>Real-Time Proctoring Risk Telemetry</h2>
+                                    <span class="badge" id="decisionBadge">CONTINUE</span>
+                                </div>
+
+                                <div class="risk-gauge-wrapper">
+                                    <div class="risk-circle-gauge" id="riskCircleGauge">
+                                        <div class="risk-number" id="riskScoreVal">0.0</div>
+                                        <div class="risk-label">RISK / 100</div>
+                                    </div>
+
+                                    <div class="risk-stats-grid">
+                                        <div class="stat-box">
+                                            <span class="stat-label">Warnings Issued</span>
+                                            <strong class="stat-val" id="warningCountVal">0 / 3</strong>
+                                        </div>
+                                        <div class="stat-box">
+                                            <span class="stat-label">Violations Detected</span>
+                                            <strong class="stat-val" id="violationCountVal">0</strong>
+                                        </div>
+                                        <div class="stat-box">
+                                            <span class="stat-label">Session State</span>
+                                            <strong class="stat-val text-green" id="sessionStatusVal">ACTIVE</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- LangGraph Event Stream Log -->
+                            <div class="card stream-log-card">
+                                <div class="card-header">
+                                    <h2>LangGraph Event Stream</h2>
+                                    <button class="btn btn-xs btn-outline" id="clearEventStreamBtn">Clear</button>
+                                </div>
+                                <div class="event-stream-list" id="eventStreamList">
+                                    <div class="stream-item info">System initialized. Ready for continuous proctoring stream.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ========================================================= -->
+            <!-- TAB 2: PROCTOR COMMAND CENTER (HITL DASHBOARD)            -->
+            <!-- ========================================================= -->
+            <section id="proctor-tab" class="tab-pane">
+                <div class="proctor-grid">
+                    <!-- Active Sessions Watchlist -->
+                    <div class="card session-watchlist-card">
+                        <div class="card-header">
+                            <h2>Live Examination Watchlist</h2>
+                            <div class="filter-group">
+                                <button class="btn btn-xs btn-outline active" id="filterAllSessions">All</button>
+                                <button class="btn btn-xs btn-outline" id="filterCriticalSessions">High Risk (&ge;70)</button>
+                                <button class="btn btn-xs btn-secondary" id="refreshSessionsBtn">🔄 Refresh</button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="session-table">
+                                <thead>
+                                    <tr>
+                                        <th>Session ID</th>
+                                        <th>Candidate</th>
+                                        <th>Risk Score</th>
+                                        <th>Warnings</th>
+                                        <th>Status</th>
+                                        <th>Decision</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="proctorSessionsTbody">
+                                    <tr>
+                                        <td colspan="7" class="text-center">Loading active candidate sessions...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Selected Session Forensic Timeline & HITL Controls -->
+                    <div class="proctor-split-row">
+                        <!-- Forensic Timeline -->
+                        <div class="card timeline-card">
+                            <div class="card-header">
+                                <h2>Forensic Evidence Timeline</h2>
+                                <span class="badge badge-info" id="timelineSessionBadge">Session: -</span>
+                            </div>
+                            <div class="timeline-summary-bar" id="timelineSummaryBar">
+                                <span>Total Events: <strong id="tlTotalEv">0</strong></span>
+                                <span>Critical: <strong class="text-red" id="tlCritEv">0</strong></span>
+                                <span>High: <strong class="text-orange" id="tlHighEv">0</strong></span>
+                                <span>Pending Review: <strong class="text-yellow" id="tlPendingEv">0</strong></span>
+                            </div>
+
+                            <div class="chronological-timeline" id="chronologicalTimeline">
+                                <p class="text-muted text-center p-4">Select a session above or submit a violation frame to view forensic timeline.</p>
+                            </div>
+                        </div>
+
+                        <!-- Human-in-the-Loop Interventions -->
+                        <div class="card proctor-action-card">
+                            <div class="card-header">
+                                <h2>Human-in-the-Loop Interventions</h2>
+                                <span class="badge badge-warning">Proctor Sign-off</span>
+                            </div>
+                            <p class="section-desc">Override or enforce proctoring decisions. Automated models will never autonomously terminate without human confirmation.</p>
+
+                            <div class="action-form">
+                                <div class="form-group">
+                                    <label>Current Target Session:</label>
+                                    <input type="text" id="targetSessionInput" class="form-control" readonly value="sess_demo_live">
+                                </div>
+                                <div class="form-group">
+                                    <label>Proctor ID:</label>
+                                    <input type="text" id="proctorIdInput" class="form-control" value="PROCTOR-HUMAN-01">
+                                </div>
+                                <div class="form-group">
+                                    <label>Rationale / Committee Notes:</label>
+                                    <textarea id="proctorNotesInput" class="form-control" rows="3" placeholder="Enter reason for proctor action or override..."></textarea>
+                                </div>
+
+                                <div class="action-buttons-grid">
+                                    <button class="btn btn-warning" id="btnProctorWarn">⚠️ Issue Warning (+1)</button>
+                                    <button class="btn btn-success" id="btnProctorApprove">✅ Approve Identity</button>
+                                    <button class="btn btn-secondary" id="btnProctorClear">🛡️ Clear Violation (-25 pts)</button>
+                                    <button class="btn btn-danger" id="btnProctorTerminate">⛔ Terminate Session</button>
+                                </div>
+
+                                <div class="action-feedback" id="proctorActionFeedback" style="display:none;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Proctor-to-Candidate Live Intercom & Stored Evidence Section -->
+                    <div class="proctor-split-row mt-3">
+                        <!-- Direct Live Candidate Intercom -->
+                        <div class="card proctor-intercom-card">
+                            <div class="card-header">
+                                <div class="header-with-icon">
+                                    <span class="header-icon">📢</span>
+                                    <div>
+                                        <h2>Direct Live Intercom & Candidate Warning Dispatch</h2>
+                                        <span class="sub-badge">Push Instant Alerts Directly to Candidate Exam HUD</span>
+                                    </div>
+                                </div>
+                                <span class="badge badge-purple">Two-Way Intercom</span>
+                            </div>
+
+                            <div class="quick-warning-chips mb-3">
+                                <span class="chips-label">Quick Warning Dispatch Templates (Click to insert):</span>
+                                <div class="chips-list">
+                                    <button class="chip-btn" data-tmpl="⚠️ Warning: Please keep your face centered in the camera feed.">Face Centering</button>
+                                    <button class="chip-btn" data-tmpl="🚫 Notice: Put away all mobile phones or electronic gadgets immediately.">Remove Phone</button>
+                                    <button class="chip-btn" data-tmpl="👥 Policy Alert: Unauthorized persons detected in exam room.">Room Isolation</button>
+                                    <button class="chip-btn" data-tmpl="👁️ Gaze Notice: Keep your eyes focused on your examination screen.">Focus on Screen</button>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <textarea id="proctorCustomMsgInput" class="form-control" rows="2" placeholder="Type custom instruction or warning to candidate..."></textarea>
+                                <div class="proctor-msg-actions mt-2">
+                                    <select id="proctorMsgSeveritySelect" class="form-select-sm">
+                                        <option value="WARNING">⚠️ Warning Notice</option>
+                                        <option value="CRITICAL">⛔ Urgent Critical Alert</option>
+                                        <option value="INFO">ℹ️ General Guidance</option>
+                                    </select>
+                                    <button class="btn btn-warning" id="btnSendProctorMsg">📢 Send Message to Candidate</button>
+                                </div>
+                            </div>
+
+                            <div class="intercom-messages-box mt-3" id="proctorMsgHistoryBox">
+                                <div class="intercom-msg proctor">
+                                    <span class="msg-author">👁️ Proctor Command</span>
+                                    <p>Live candidate intercom channel active.</p>
+                                    <span class="msg-time">System Ready</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stored Violation Evidence Gallery in Proctor Center -->
+                        <div class="card evidence-gallery-card">
+                            <div class="card-header">
+                                <div class="header-with-icon">
+                                    <span class="header-icon">📸</span>
+                                    <div>
+                                        <h2>Session Violation Proof Gallery</h2>
+                                        <span class="sub-badge">Annotated Frames with Computer Vision Bounding Boxes</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-xs btn-outline" id="refreshEvidenceBtn">🔄 Refresh Keyframes</button>
+                            </div>
+                            <div class="evidence-grid" id="proctorEvidenceGrid">
+                                <p class="text-muted text-center p-4">No violation keyframes stored for this session yet.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

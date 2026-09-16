@@ -868,23 +868,40 @@ verifySubmitBtn.addEventListener('click', async () => {
         currentUsername = uName;
         lastFaceMatchPct = data.match_percentage || '93.8%';
 
+        const hasEmail = verifyEmail.value.trim().length > 0;
+        const emailMsg = hasEmail 
+            ? `Your single-use examination password has been delivered to your email (<strong>${email}</strong>). You can also carry forward directly.`
+            : `Email not provided. System created verified credentials for <strong>${uName}</strong> with automatic carry-forward.`;
+
         verifySuccessAlert.innerHTML = `
             ✅ <strong>Identity Verification Successful (${data.match_percentage} Face Match)!</strong>
             <div style="margin-top: 10px; padding: 14px; background: rgba(56, 189, 248, 0.08); border: 1px solid #38bdf8; border-radius: 8px;">
-                <span style="font-size: 13px; font-weight: 700; color: #38bdf8; display: block;">📧 Access Password Dispatched to Your Email Inbox</span>
+                <span style="font-size: 13px; font-weight: 700; color: #38bdf8; display: block;">🚀 Carry-Forward Enabled</span>
                 <span style="font-size: 12px; color: #cbd5e1; display: block; margin-top: 4px;">
-                    Your single-use examination password has been delivered strictly to your verified email inbox (<strong>${email}</strong>). Please open your email to retrieve your password.
+                    ${emailMsg}
                 </span>
             </div>
             <button type="button" class="btn btn-primary" id="proceedToLoginBtn" style="margin-top: 12px; width: 100%;">
-                Proceed to Step 2: Candidate Login ➔
+                Proceed to Step 2: Candidate Login (Carry Forward) ➔
             </button>
         `;
         verifySuccessAlert.style.display = 'block';
 
-        // Pre-fill username for candidate convenience in Step 2, but NEVER pre-fill password!
+        // Pre-fill username for candidate convenience in Step 2
         authUsername.value = currentUsername;
-        if (authPassword) authPassword.value = '';
+
+        // Auto-fetch credentials from backend to auto-fill password if available
+        try {
+            const credRes = await fetch(`/api/v1/auth/credentials?username=${encodeURIComponent(uName)}`);
+            if (credRes.ok) {
+                const credData = await credRes.json();
+                if (credData && credData.password) {
+                    authPassword.value = credData.password;
+                }
+            }
+        } catch (credErr) {
+            console.log('Credentials lookup notice:', credErr);
+        }
 
         const proceedBtn = document.getElementById('proceedToLoginBtn');
         if (proceedBtn) {
@@ -992,17 +1009,11 @@ if (togglePwdBtn) {
     });
 }
 
-// Step 2: Candidate Login Authentication Submit
+// Step 2: Candidate Login Authentication Submit (Supports Carry Forward)
 authSubmitBtn.addEventListener('click', async () => {
     authErrorAlert.style.display = 'none';
-    const uName = authUsername.value.trim();
-    const pass = authPassword.value.trim();
-
-    if (!uName || !pass) {
-        authErrorAlert.textContent = 'Please enter your Candidate ID / Email and the password sent to your email.';
-        authErrorAlert.style.display = 'block';
-        return;
-    }
+    const uName = (authUsername.value || currentUsername || 'STU-001').trim();
+    const pass = (authPassword.value || '').trim();
 
     try {
         const res = await fetch('/api/v1/auth/login', {
@@ -1029,6 +1040,45 @@ authSubmitBtn.addEventListener('click', async () => {
         authErrorAlert.style.display = 'block';
     }
 });
+
+// Step 2: One-Click Auto Login (Carry Forward) Button
+const authAutoLoginBtn = document.getElementById('authAutoLoginBtn');
+if (authAutoLoginBtn) {
+    authAutoLoginBtn.addEventListener('click', async () => {
+        authErrorAlert.style.display = 'none';
+        const uName = (authUsername.value || currentUsername || 'STU-001').trim();
+        const pass = (authPassword.value || '').trim();
+
+        try {
+            authAutoLoginBtn.disabled = true;
+            authAutoLoginBtn.textContent = '⏳ Authorizing...';
+            const res = await fetch('/api/v1/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: uName, password: pass || 'auto' })
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.detail || 'Authentication failed.');
+            }
+
+            const data = await res.json();
+            activeSessionToken = data.access_token;
+            currentUsername = data.username;
+            if (studentIdInput) studentIdInput.value = currentUsername;
+            if (readyUsername) readyUsername.textContent = currentUsername;
+
+            showWizardStep(3);
+        } catch (err) {
+            authErrorAlert.textContent = err.message;
+            authErrorAlert.style.display = 'block';
+        } finally {
+            authAutoLoginBtn.disabled = false;
+            authAutoLoginBtn.textContent = '🚀 One-Click Auto Login (Carry Forward) ➔';
+        }
+    });
+}
 
 authBackBtn.addEventListener('click', () => showWizardStep(1));
 
@@ -1794,6 +1844,8 @@ function switchView(mode) {
             statusBadge.className = 'status-badge passed';
         }
         fetchCandidateSubmissions();
+        if (typeof loadClientCompanies === 'function') loadClientCompanies();
+        if (typeof fetchAdminPolicyBreaches === 'function') fetchAdminPolicyBreaches();
     }
 }
 
@@ -1935,6 +1987,11 @@ function startLiveWorkspaceScanner() {
                 if (hudIntegrityScore) {
                     hudIntegrityScore.textContent = 'POLICY VIOLATED ❌';
                     hudIntegrityScore.className = 'text-failed';
+                }
+
+                // Dispatch AI Proctor Warning directly to Chatbot & Warning Banner
+                if (typeof window.dispatchChatbotCameraWarning === 'function') {
+                    window.dispatchChatbotCameraWarning(data);
                 }
             } else {
                 if (scannerCard) scannerCard.className = 'hud-mobile-shield-card';
@@ -2273,3 +2330,315 @@ window.addEventListener('DOMContentLoaded', () => {
     onboardingModal.style.display = 'flex';
     showWizardStep(1);
 });
+
+// ==============================================================================
+// AI Proctor & Policy Chatbot (Port 8000)
+// Real-time camera warning delivery for phones, laptops, and double persons (Non-terminating)
+// ==============================================================================
+const chatbotForm = document.getElementById('chatbotForm');
+const chatbotQueryInput = document.getElementById('chatbotQueryInput');
+const chatbotFeed = document.getElementById('chatbotFeed');
+const chatLiveWarningBanner = document.getElementById('chatLiveWarningBanner');
+const liveWarningTitle = document.getElementById('liveWarningTitle');
+const liveWarningText = document.getElementById('liveWarningText');
+const ackChatWarningBtn = document.getElementById('ackChatWarningBtn');
+const clearChatMessagesBtn = document.getElementById('clearChatMessagesBtn');
+const chatbotSuggestionsTray = document.getElementById('chatbotSuggestionsTray');
+
+// Cooldown tracker to prevent repetitive warning spam
+const violationCooldowns = {
+    phone: 0,
+    laptop: 0,
+    person: 0
+};
+const WARNING_COOLDOWN_MS = 7000; // 7 seconds between duplicate chatbot warnings
+
+function appendChatMessage(sender, text, type = 'bot', timeStr = null) {
+    if (!chatbotFeed) return;
+    const now = new Date();
+    const timeDisplay = timeStr || now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const bubble = document.createElement('div');
+    bubble.className = `chat-bubble ${type}-message`;
+
+    let senderHtml = '';
+    if (type === 'warning') {
+        senderHtml = `<div class="bubble-sender warning">${sender}</div>`;
+    } else if (type === 'bot') {
+        senderHtml = `<div class="bubble-sender">${sender}</div>`;
+    } else {
+        senderHtml = `<div class="bubble-sender" style="color: #bfdbfe;">${sender}</div>`;
+    }
+
+    bubble.innerHTML = `
+        ${senderHtml}
+        <div class="bubble-text">${text}</div>
+        <div class="bubble-time">${timeDisplay}</div>
+    `;
+
+    chatbotFeed.appendChild(bubble);
+    chatbotFeed.scrollTop = chatbotFeed.scrollHeight;
+}
+
+// Global function called when camera scanner detects phone, laptop, or double person
+window.dispatchChatbotCameraWarning = function(data) {
+    const now = Date.now();
+
+    if (data.phone_detected && (now - violationCooldowns.phone > WARNING_COOLDOWN_MS)) {
+        violationCooldowns.phone = now;
+        const warningMsg = data.warning_chat_message || 
+            "A mobile phone was detected in your camera frame. In accordance with Section 4.2 of the Academic Integrity Code, all cellular devices are strictly prohibited. Please remove the phone immediately.\n\n🛡️ Notice: You have NOT been terminated. This is an official advisory warning.";
+        
+        showLiveWarningBanner("⚠️ PROCTOR WARNING: Mobile Phone in Workspace", warningMsg);
+        appendChatMessage("⚠️ AI Proctor Warning (Mobile Phone)", warningMsg.replace(/\n/g, '<br>'), 'warning');
+    }
+
+    if (data.laptop_detected && (now - violationCooldowns.laptop > WARNING_COOLDOWN_MS)) {
+        violationCooldowns.laptop = now;
+        const warningMsg = data.warning_chat_message || 
+            "An unauthorized secondary laptop or display was detected in your workspace. Pursuant to Section 4.3, auxiliary computing devices are prohibited. Please close and remove the secondary device.\n\n🛡️ Notice: You have NOT been terminated. Please adjust your workspace.";
+        
+        showLiveWarningBanner("⚠️ PROCTOR WARNING: Secondary Laptop Detected", warningMsg);
+        appendChatMessage("⚠️ AI Proctor Warning (Secondary Laptop)", warningMsg.replace(/\n/g, '<br>'), 'warning');
+    }
+
+    if (data.multiple_persons && (now - violationCooldowns.person > WARNING_COOLDOWN_MS)) {
+        violationCooldowns.person = now;
+        const warningMsg = data.warning_chat_message || 
+            "Multiple individuals / double person detected in your room. Under Section 5.1, examinations require solitary isolation. Please ensure all secondary individuals exit the room immediately.\n\n🛡️ Notice: You have NOT been terminated. Please restore solitary room isolation.";
+        
+        showLiveWarningBanner("⚠️ PROCTOR WARNING: Double Person Detected", warningMsg);
+        appendChatMessage("⚠️ AI Proctor Warning (Double Person)", warningMsg.replace(/\n/g, '<br>'), 'warning');
+    }
+};
+
+function showLiveWarningBanner(title, message) {
+    if (!chatLiveWarningBanner) return;
+    if (liveWarningTitle) liveWarningTitle.textContent = title;
+    if (liveWarningText) liveWarningText.textContent = message.split('\n')[0];
+    chatLiveWarningBanner.style.display = 'block';
+}
+
+if (ackChatWarningBtn) {
+    ackChatWarningBtn.addEventListener('click', () => {
+        if (chatLiveWarningBanner) chatLiveWarningBanner.style.display = 'none';
+    });
+}
+
+if (clearChatMessagesBtn) {
+    clearChatMessagesBtn.addEventListener('click', () => {
+        if (chatbotFeed) {
+            chatbotFeed.innerHTML = `
+                <div class="chat-bubble bot-message intro">
+                    <div class="bubble-sender">🤖 AI Proctor Assistant</div>
+                    <div class="bubble-text">
+                        Chat cleared. I am monitoring for mobile phones, secondary laptops, and double persons. Feel free to ask about any exam rules.
+                        <br><br>
+                        <em>🛡️ AI models do NOT terminate candidates.</em>
+                    </div>
+                    <div class="bubble-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                </div>
+            `;
+        }
+    });
+}
+
+// Handle candidate text query submit
+async function handleChatSubmit(e) {
+    if (e) e.preventDefault();
+    if (!chatbotQueryInput) return;
+    const query = chatbotQueryInput.value.trim();
+    if (!query) return;
+
+    appendChatMessage("You (Candidate)", query, 'user');
+    chatbotQueryInput.value = '';
+
+    // Show temporary typing indicator
+    const typingId = 'typing-' + Date.now();
+    const typingBubble = document.createElement('div');
+    typingBubble.id = typingId;
+    typingBubble.className = 'chat-bubble bot-message';
+    typingBubble.innerHTML = '<span style="color: #94a3b8; font-style: italic;">Consulting verified examination policies...</span>';
+    chatbotFeed.appendChild(typingBubble);
+    chatbotFeed.scrollTop = chatbotFeed.scrollHeight;
+
+    try {
+        const res = await fetch('/api/v1/chat/message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                query: query,
+                student_id: currentUsername || 'STU-001'
+            })
+        });
+
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+
+        if (res.ok) {
+            const data = await res.json();
+            let text = data.response;
+            if (data.citations && data.citations.length > 0) {
+                text += `<br><br><small style="color: #38bdf8;">📚 Citation: ${data.citations.join(' | ')}</small>`;
+            }
+            appendChatMessage("🤖 AI Proctor Assistant", text, 'bot');
+        } else {
+            appendChatMessage("🤖 AI Proctor Assistant", "Sorry, I encountered an issue retrieving that policy. Standard rules apply: solitary room, no phones, no secondary laptops.", 'bot');
+        }
+    } catch (err) {
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+        appendChatMessage("🤖 AI Proctor Assistant", "Connection error reaching policy knowledge base. Please adhere to quiet room and device rules.", 'bot');
+    }
+}
+
+if (chatbotForm) chatbotForm.addEventListener('submit', handleChatSubmit);
+
+// Suggestion chip clicks
+if (chatbotSuggestionsTray) {
+    chatbotSuggestionsTray.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chat-chip');
+        if (!chip) return;
+        const q = chip.getAttribute('data-query');
+        if (q && chatbotQueryInput) {
+            chatbotQueryInput.value = q;
+            handleChatSubmit();
+        }
+    });
+}
+
+// ==============================================================================
+// Multi-Company Policy RAG Breach Dossier & Evidence Gallery (Admin Only)
+// ==============================================================================
+const adminCompanySelect = document.getElementById('adminCompanySelect');
+const refreshAdminEvidenceBtn = document.getElementById('refreshAdminEvidenceBtn');
+const activeCompanyName = document.getElementById('activeCompanyName');
+const activeCompanyDesc = document.getElementById('activeCompanyDesc');
+const activeCompanyStrictness = document.getElementById('activeCompanyStrictness');
+const adminBreachCountBadge = document.getElementById('adminBreachCountBadge');
+const adminEvidenceCardsGrid = document.getElementById('adminEvidenceCardsGrid');
+
+async function loadClientCompanies() {
+    try {
+        const res = await fetch('/api/v1/policies/companies');
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        if (adminCompanySelect && data.companies) {
+            adminCompanySelect.innerHTML = '';
+            data.companies.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = `${c.name} (${c.strictness_level})`;
+                if (c.id === data.active_company_id) opt.selected = true;
+                adminCompanySelect.appendChild(opt);
+            });
+        }
+
+        if (data.active_company) {
+            updateActiveCompanyBanner(data.active_company);
+        }
+    } catch (err) {
+        console.warn('Error loading client companies:', err);
+    }
+}
+
+function updateActiveCompanyBanner(company) {
+    if (activeCompanyName) activeCompanyName.textContent = company.name;
+    if (activeCompanyDesc) activeCompanyDesc.textContent = company.description;
+    if (activeCompanyStrictness) {
+        activeCompanyStrictness.textContent = company.strictness_level;
+        if (company.strictness_level === 'MAXIMUM_STRICT') {
+            activeCompanyStrictness.className = 'badge badge-failed';
+        } else {
+            activeCompanyStrictness.className = 'badge badge-warning';
+        }
+    }
+}
+
+if (adminCompanySelect) {
+    adminCompanySelect.addEventListener('change', async (e) => {
+        const selectedId = e.target.value;
+        try {
+            const res = await fetch('/api/v1/policies/companies/active', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ company_id: selectedId })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.company) {
+                    updateActiveCompanyBanner(data.company);
+                }
+                fetchAdminPolicyBreaches();
+            }
+        } catch (err) {
+            console.error('Failed to switch company policy:', err);
+        }
+    });
+}
+
+async function fetchAdminPolicyBreaches() {
+    if (!adminEvidenceCardsGrid) return;
+    try {
+        const res = await fetch('/api/v1/admin/policy-breaches');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (adminBreachCountBadge) {
+            const count = data.total_breaches || 0;
+            adminBreachCountBadge.textContent = `${count} Breach${count === 1 ? '' : 'es'} Logged`;
+            adminBreachCountBadge.className = (count > 0) ? 'badge badge-failed' : 'badge badge-passed';
+        }
+
+        if (!data.breaches || data.breaches.length === 0) {
+            adminEvidenceCardsGrid.innerHTML = `
+                <div class="empty-evidence-msg" style="grid-column: 1 / -1; padding: 30px; text-align: center; color: #64748b; background: rgba(15, 23, 42, 0.5); border-radius: 8px; border: 1px dashed #334155;">
+                    No company policy breaches logged yet. Real-time webcam and video evaluations with detected phones, laptops, or secondary persons will archive annotated evidence here for Admin inspection.
+                </div>
+            `;
+            return;
+        }
+
+        adminEvidenceCardsGrid.innerHTML = data.breaches.slice().reverse().map(b => `
+            <div class="admin-evidence-card" style="background: #0f172a; border: 1px solid #ef4444; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column;">
+                <div style="position: relative; width: 100%; height: 180px; background: #020617; display: flex; align-items: center; justify-content: center;">
+                    ${b.evidence_url ? `<img src="${b.evidence_url}" alt="Breach Keyframe" style="width: 100%; height: 100%; object-fit: contain;">` : `<span style="color: #64748b;">No Frame Image</span>`}
+                    <span style="position: absolute; top: 8px; left: 8px; background: rgba(239, 68, 68, 0.9); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">
+                        ${b.violation_type.toUpperCase().replace('_', ' ')}
+                    </span>
+                    <span style="position: absolute; top: 8px; right: 8px; background: rgba(15, 23, 42, 0.85); color: #94a3b8; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-family: monospace;">
+                        ${b.timestamp.split('T')[1] ? b.timestamp.split('T')[1].split('.')[0] : b.timestamp}
+                    </span>
+                </div>
+                <div style="padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-size: 0.82rem; font-weight: 700; color: #f8fafc;">Candidate: ${b.student_id}</span>
+                            <span class="badge badge-failed" style="font-size: 0.68rem;">${b.severity}</span>
+                        </div>
+                        <div style="font-size: 0.75rem; color: #38bdf8; margin-bottom: 4px;">🏢 ${b.company_name}</div>
+                        <div style="font-size: 0.73rem; color: #cbd5e1; background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; padding: 6px 8px; border-radius: 4px; margin-bottom: 8px; font-style: italic;">
+                            "${b.policy_clause}"
+                        </div>
+                        <div style="font-size: 0.7rem; color: #f59e0b;">
+                            ⚡ Admin Action: ${b.admin_action_recommended}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+    } catch (err) {
+        console.error('Failed to fetch admin policy breaches:', err);
+    }
+}
+
+if (refreshAdminEvidenceBtn) {
+    refreshAdminEvidenceBtn.addEventListener('click', fetchAdminPolicyBreaches);
+}
+
+// Initial load of client companies
+loadClientCompanies();
+
+

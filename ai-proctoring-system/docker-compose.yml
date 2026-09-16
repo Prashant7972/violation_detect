@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  proctor-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: proctor_api_service
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      - APP_ENV=production
+      - API_PORT=8001
+      - API_HOST=0.0.0.0
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-""}
+      - GEMINI_MODEL_ID=gemini-2.5-flash
+      - REDIS_URL=redis://proctor-redis:6379/0
+      - DATABASE_URL=postgresql://proctor_admin:proctor_secret@proctor-db:5432/proctoring_db
+    depends_on:
+      - proctor-redis
+      - proctor-db
+
+  proctor-redis:
+    image: redis:7-alpine
+    container_name: proctor_redis_cache
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+
+  proctor-db:
+    image: postgres:16-alpine
+    container_name: proctor_postgres_db
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=proctor_admin
+      - POSTGRES_PASSWORD=proctor_secret
+      - POSTGRES_DB=proctoring_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  redis_data:
+  postgres_data:

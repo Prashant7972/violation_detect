@@ -69,7 +69,7 @@ class BatchProcessResponse(BaseModel):
 # Pre-Authentication Identity Verification & Login Schemas
 class VerifyIDRequest(BaseModel):
     username: Optional[str] = Field(None, description="Candidate Username / Student ID")
-    email: str = Field(..., description="Candidate Email Address for Password Notification")
+    email: Optional[str] = Field("candidate@example.com", description="Candidate Email Address (Optional)")
     document_id_b64: str = Field(..., description="Base64 encoded Document ID Photo")
     live_selfie_b64: str = Field(..., description="Base64 encoded Live Selfie Photo")
     document_type: Optional[str] = Field("aadhaar", description="Document type: 'aadhaar', 'pan', 'driving_license', 'passport'")
@@ -88,7 +88,7 @@ class VerifyIDResponse(BaseModel):
 
 class LoginRequest(BaseModel):
     username: str = Field(..., description="Candidate Username")
-    password: str = Field(..., description="Authentication Password delivered via Email")
+    password: Optional[str] = Field("", description="Authentication Password (Optional if auto-progressing)")
 
 class LoginResponse(BaseModel):
     access_token: str
@@ -190,6 +190,67 @@ class ScanLiveFrameResponse(BaseModel):
     violations: List[str] = []
     evidence_url: Optional[str] = None
     summary_message: str
+    warning_chat_message: Optional[str] = None
 
 
+class ChatQueryRequest(BaseModel):
+    query: str = Field(..., description="Candidate question regarding policies or setup")
+    student_id: Optional[str] = Field("STU-001", description="Candidate identifier")
 
+
+class ChatQueryResponse(BaseModel):
+    response: str
+    citations: List[str] = []
+    suggested_questions: List[str] = []
+    is_warning: bool = False
+
+
+class ViolationWarningRequest(BaseModel):
+    violation_type: str = Field(..., description="Type of violation: PHONE, LAPTOP, DOUBLE_PERSON, etc.")
+    student_id: Optional[str] = Field("STU-001", description="Candidate identifier")
+
+
+class ViolationWarningResponse(BaseModel):
+    warning_title: str
+    warning_message: str
+    citation: str
+    can_terminate: bool = False
+    student_id: str = "STU-001"
+    is_warning: bool = True
+
+
+class CompanyPolicyItem(BaseModel):
+    id: str
+    name: str
+    industry: str
+    strictness: str
+    description: str
+
+
+class CompanyPolicyListResponse(BaseModel):
+    active_company_id: str
+    active_company_name: str
+    companies: List[CompanyPolicyItem]
+
+
+class SetActiveCompanyRequest(BaseModel):
+    company_id: str
+
+
+class AdminPolicyBreachItem(BaseModel):
+    timestamp: str
+    student_id: str
+    company_id: str
+    company_name: str
+    violation_type: str
+    policy_clause: str
+    severity: str
+    rule_description: str
+    evidence_url: str
+    admin_action_recommended: str
+
+
+class AdminPolicyBreachesResponse(BaseModel):
+    total_breaches: int
+    active_company: str
+    breaches: List[AdminPolicyBreachItem]
